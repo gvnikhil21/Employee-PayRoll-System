@@ -17,6 +17,7 @@ public class EmployeePayRollService {
 		});
 		try {
 			Files.write(Paths.get(PATH_FILE), empBuilder.toString().getBytes());
+			EmployeePayRollMain.consoleWriter.write("Details saved successfully to employeePayRollDetails.txt\n");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -29,5 +30,17 @@ public class EmployeePayRollService {
 			e.printStackTrace();
 		}
 		return 0;
+	}
+
+	public void printDetails() {
+		try {
+			StringBuilder empBuilder = new StringBuilder();
+			Files.lines(Paths.get(PATH_FILE)).forEach(e -> {
+				empBuilder.append(e + "\n");
+			});
+			EmployeePayRollMain.consoleWriter.write(empBuilder.toString());
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 }
