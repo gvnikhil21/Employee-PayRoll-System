@@ -27,4 +27,20 @@ public class EmployeePayRollMainTest {
 		assertEquals(Long.valueOf(3), entriesCount);
 	}
 
+	@Test
+	public void givenThreeEmployees_WhenReadFromFile_ShouldMatchEmployeeEntries() {
+		EmployeePayRoll[] empArray = { new EmployeePayRoll("1", "Bill", 1000000),
+				new EmployeePayRoll("3", "Bezos", 2000000), new EmployeePayRoll("3", "Musk", 3000000) };
+		EmployeePayRollMain employeePayRollMain = new EmployeePayRollMain(Arrays.asList(empArray));
+		Integer entriesCount = 0;
+		try {
+			employeePayRollMain.writeEmployeePayRollDetails(EmployeePayRollMain.IOService.FILE_IO);
+			employeePayRollMain.readEmployeePayRollDetails(EmployeePayRollMain.IOService.FILE_IO);
+			entriesCount = employeePayRollMain.employeePayRollList.size();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		assertEquals(Integer.valueOf(3), entriesCount);
+	}
+
 }

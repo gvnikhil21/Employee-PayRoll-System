@@ -3,6 +3,7 @@ package com.bridgelabs.employeepayroll.controller;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
 
 import com.bridgelabs.employeepayroll.model.EmployeePayRoll;
@@ -10,6 +11,7 @@ import com.bridgelabs.employeepayroll.model.EmployeePayRoll;
 public class EmployeePayRollService {
 	private static final String PATH_FILE = "D:\\AssignmentBridgeLabs\\Employee PayRoll System\\employeePayRollFile.txt";
 
+	// writes details to employeePayRolllDetails.txt file
 	public void writeEmployeePayRollDetailsToFile(List<EmployeePayRoll> employeePayRollList) {
 		StringBuilder empBuilder = new StringBuilder();
 		employeePayRollList.stream().forEach(emp -> {
@@ -23,6 +25,7 @@ public class EmployeePayRollService {
 		}
 	}
 
+	// counts entries in employeePayRolllDetails.txt file
 	public long countEntries() {
 		try {
 			return Files.lines(Paths.get(PATH_FILE)).count();
@@ -32,6 +35,7 @@ public class EmployeePayRollService {
 		return 0;
 	}
 
+	// prints the details in employeePayRolllDetails.txt file
 	public void printDetails() {
 		try {
 			StringBuilder empBuilder = new StringBuilder();
@@ -42,5 +46,19 @@ public class EmployeePayRollService {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+
+	// read data from employeePayRolllDetails.txt file
+	public List<EmployeePayRoll> readEmployeePayRollDetailsFromFile() throws IOException {
+		List<EmployeePayRoll> empList = new ArrayList<EmployeePayRoll>();
+		Files.lines(Paths.get(PATH_FILE)).forEach(line -> {
+			line = line.replace("Employee ID: ", "");
+			line = line.replace(" Employee Name: ", ",");
+			line = line.replace(" Employee Salary: ", ",");
+			String empData[] = line.toString().trim().split(",");
+			empList.add(new EmployeePayRoll(empData[0], empData[1], Long.parseLong(empData[2])));
+		});
+		EmployeePayRollMain.consoleWriter.write("Details read successfully from employeePayRollDetails.txt\n");
+		return empList;
 	}
 }

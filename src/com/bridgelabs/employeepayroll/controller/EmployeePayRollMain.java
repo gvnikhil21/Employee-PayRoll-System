@@ -7,17 +7,20 @@ import java.util.List;
 import com.bridgelabs.employeepayroll.model.*;
 
 public class EmployeePayRollMain {
-	private List<EmployeePayRoll> employeePayRollList;
+	public List<EmployeePayRoll> employeePayRollList;
 	public static BufferedWriter consoleWriter;
+	public static BufferedReader consoleReader;
 
 	public EmployeePayRollMain() {
 		employeePayRollList = new ArrayList<EmployeePayRoll>();
 		consoleWriter = new BufferedWriter(new OutputStreamWriter(System.out));
+		consoleReader = new BufferedReader(new InputStreamReader(System.in));
 	}
 
 	public EmployeePayRollMain(List<EmployeePayRoll> employeePayRollList) {
 		this.employeePayRollList = employeePayRollList;
 		consoleWriter = new BufferedWriter(new OutputStreamWriter(System.out));
+		consoleReader = new BufferedReader(new InputStreamReader(System.in));
 	}
 
 	public enum IOService {
@@ -25,7 +28,6 @@ public class EmployeePayRollMain {
 	}
 
 	public static void main(String[] args) {
-		BufferedReader consoleReader = new BufferedReader(new InputStreamReader(System.in));
 		EmployeePayRollMain employeePayRollMain = new EmployeePayRollMain();
 		try {
 			consoleWriter.write("Welcome to Employee Payroll System!\n");
@@ -33,12 +35,12 @@ public class EmployeePayRollMain {
 			int choice;
 			do {
 				consoleWriter.write(
-						"Chooose one option:\n1. Read and add employee payRoll details from console\n2. Write employee payRoll details to console\n3. Wrie employee payRoll details to a file\n4. Print details from file\n5. Find no. of entries in file\n6. Exit\n");
+						"Chooose one option:\n1. Read and add employee payRoll details from console\n2. Write employee payRoll details to console\n3. Wrie employee payRoll details to a file\n4. Print details from file\n5. Find no. of entries in file\n6. Read employee payRoll details from the file\n7. Exit\n");
 				consoleWriter.flush();
 				choice = Integer.parseInt(consoleReader.readLine());
 				switch (choice) {
 				case 1:
-					employeePayRollMain.readEmployeePayRollDetails(consoleReader);
+					employeePayRollMain.readEmployeePayRollDetails(IOService.CONSOLE_IO);
 					break;
 				case 2:
 					employeePayRollMain.writeEmployeePayRollDetails(IOService.CONSOLE_IO);
@@ -55,6 +57,9 @@ public class EmployeePayRollMain {
 					employeePayRollMain.countEntries(IOService.FILE_IO);
 					break;
 				case 6:
+					employeePayRollMain.readEmployeePayRollDetails(IOService.FILE_IO);
+					break;
+				case 7:
 					consoleWriter.write("Thanks for using our system!");
 					consoleWriter.flush();
 					break;
@@ -63,7 +68,7 @@ public class EmployeePayRollMain {
 					consoleWriter.flush();
 					break;
 				}
-			} while (choice != 6);
+			} while (choice != 7);
 		} catch (NumberFormatException | IOException e) {
 			e.printStackTrace();
 		} finally {
@@ -77,18 +82,22 @@ public class EmployeePayRollMain {
 	}
 
 	// reads employee payroll details from console
-	private void readEmployeePayRollDetails(BufferedReader consoleReader) throws IOException {
-		consoleWriter.write("Enter the employee Id: \n");
-		consoleWriter.flush();
-		String id = consoleReader.readLine();
-		consoleWriter.write("Enter the employee name: \n");
-		consoleWriter.flush();
-		String name = consoleReader.readLine();
-		consoleWriter.write("Enter the employee salary: \n");
-		consoleWriter.flush();
-		Long salary = Long.parseLong(consoleReader.readLine());
-		EmployeePayRoll employeePayRoll = new EmployeePayRoll(id, name, salary);
-		employeePayRollList.add(employeePayRoll);
+	public void readEmployeePayRollDetails(IOService ioService) throws IOException {
+		if (ioService.equals(IOService.CONSOLE_IO)) {
+			consoleWriter.write("Enter the employee Id: \n");
+			consoleWriter.flush();
+			String id = consoleReader.readLine();
+			consoleWriter.write("Enter the employee name: \n");
+			consoleWriter.flush();
+			String name = consoleReader.readLine();
+			consoleWriter.write("Enter the employee salary: \n");
+			consoleWriter.flush();
+			Long salary = Long.parseLong(consoleReader.readLine());
+			EmployeePayRoll employeePayRoll = new EmployeePayRoll(id, name, salary);
+			employeePayRollList.add(employeePayRoll);
+		} else {
+			this.employeePayRollList = new EmployeePayRollService().readEmployeePayRollDetailsFromFile();
+		}
 	}
 
 	// writes employee payroll details to console
