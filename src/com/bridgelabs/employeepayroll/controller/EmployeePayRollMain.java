@@ -8,21 +8,54 @@ import com.bridgelabs.employeepayroll.model.*;
 
 public class EmployeePayRollMain {
 	private List<EmployeePayRoll> employeePayRollList;
+	public static BufferedWriter consoleWriter;
 
 	public EmployeePayRollMain() {
 		employeePayRollList = new ArrayList<EmployeePayRoll>();
 	}
 
+	public EmployeePayRollMain(List<EmployeePayRoll> employeePayRollList) {
+		this.employeePayRollList = employeePayRollList;
+	}
+
+	public enum IOService {
+		CONSOLE_IO, FILE_IO
+	}
+
 	public static void main(String[] args) {
 		BufferedReader consoleReader = new BufferedReader(new InputStreamReader(System.in));
-		BufferedWriter consoleWriter = new BufferedWriter(new OutputStreamWriter(System.out));
+		consoleWriter = new BufferedWriter(new OutputStreamWriter(System.out));
 		EmployeePayRollMain employeePayRollMain = new EmployeePayRollMain();
 		try {
 			consoleWriter.write("Welcome to Employee Payroll System!\n");
 			consoleWriter.flush();
-			employeePayRollMain.readEmployeePayRollDetails(consoleWriter, consoleReader);
-			employeePayRollMain.writeEmployeePayRollDetails(consoleWriter);
-		} catch (IOException e) {
+			int choice;
+			do {
+				consoleWriter.write(
+						"Chooose one option:\n1. Read and add employee payRoll details from console\n2. Write employee payRoll details to console\n3. Wrie employee payRoll details to a file\n4. Exit\n");
+				consoleWriter.flush();
+				choice = Integer.parseInt(consoleReader.readLine());
+				switch (choice) {
+				case 1:
+					employeePayRollMain.readEmployeePayRollDetails(consoleReader);
+					break;
+				case 2:
+					employeePayRollMain.writeEmployeePayRollDetails(IOService.CONSOLE_IO);
+					break;
+				case 3:
+					employeePayRollMain.writeEmployeePayRollDetails(IOService.FILE_IO);
+					break;
+				case 4:
+					consoleWriter.write("Thanks for using our system!");
+					consoleWriter.flush();
+					break;
+				default:
+					consoleWriter.write("Please enter valid choice!");
+					consoleWriter.flush();
+					break;
+				}
+			} while (choice != 4);
+		} catch (NumberFormatException | IOException e) {
 			e.printStackTrace();
 		} finally {
 			try {
@@ -35,8 +68,7 @@ public class EmployeePayRollMain {
 	}
 
 	// reads employee payroll details from console
-	private void readEmployeePayRollDetails(BufferedWriter consoleWriter, BufferedReader consoleReader)
-			throws IOException {
+	private void readEmployeePayRollDetails(BufferedReader consoleReader) throws IOException {
 		consoleWriter.write("Enter the employee Id: \n");
 		consoleWriter.flush();
 		String id = consoleReader.readLine();
@@ -51,7 +83,19 @@ public class EmployeePayRollMain {
 	}
 
 	// writes employee payroll details to console
-	private void writeEmployeePayRollDetails(BufferedWriter consoleWriter) throws IOException {
-		consoleWriter.write(employeePayRollList.toString());
+	public void writeEmployeePayRollDetails(IOService ioService) throws IOException {
+		if (ioService.equals(IOService.CONSOLE_IO))
+			consoleWriter.write(employeePayRollList.toString());
+		else {
+			new EmployeePayRollService().writeEmployeePayRollDetailsToFile(employeePayRollList);
+		}
+	}
+
+	// counts no. of entries
+	public long countEntries(IOService ioService) {
+		if (ioService.equals(IOService.FILE_IO)) {
+			return new EmployeePayRollService().countEntries();
+		}
+		return 0;
 	}
 }
