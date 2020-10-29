@@ -67,6 +67,7 @@ public class EmployeePayRollService {
 		return empList;
 	}
 
+	// reads employee payRoll details from database
 	public List<EmployeePayRoll> readEmployeePayRollDetailsFromDatabase() {
 		List<EmployeePayRoll> empList = new ArrayList<EmployeePayRoll>();
 		Connection con = PayRollDatabaseConnector.getConnection();
@@ -81,7 +82,7 @@ public class EmployeePayRollService {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		EmployeePayRollMain.LOG.info("Details read successfully from payroll_service database");
+		EmployeePayRollMain.LOG.info("Details read successfully from database");
 		return empList;
 	}
 }

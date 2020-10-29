@@ -54,5 +54,4 @@ public class EmployeePayRollMainTest {
 		}
 		assertEquals(Integer.valueOf(4), entriesCount);
 	}
-
 }
