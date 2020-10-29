@@ -3,9 +3,14 @@ package com.bridgelabs.employeepayroll.controller;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.bridgelabs.employeepayroll.connector.PayRollDatabaseConnector;
 import com.bridgelabs.employeepayroll.model.EmployeePayRoll;
 
 public class EmployeePayRollService {
@@ -19,7 +24,7 @@ public class EmployeePayRollService {
 		});
 		try {
 			Files.write(Paths.get(PATH_FILE), empBuilder.toString().getBytes());
-			EmployeePayRollMain.consoleWriter.write("Details saved successfully to employeePayRollDetails.txt\n");
+			EmployeePayRollMain.LOG.info("Details saved successfully to employeePayRollDetails.txt");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -42,7 +47,7 @@ public class EmployeePayRollService {
 			Files.lines(Paths.get(PATH_FILE)).forEach(e -> {
 				empBuilder.append(e + "\n");
 			});
-			EmployeePayRollMain.consoleWriter.write(empBuilder.toString());
+			EmployeePayRollMain.LOG.info(empBuilder.toString());
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -58,7 +63,25 @@ public class EmployeePayRollService {
 			String empData[] = line.toString().trim().split(",");
 			empList.add(new EmployeePayRoll(empData[0], empData[1], Long.parseLong(empData[2])));
 		});
-		EmployeePayRollMain.consoleWriter.write("Details read successfully from employeePayRollDetails.txt\n");
+		EmployeePayRollMain.LOG.info("Details read successfully from employeePayRollDetails.txt");
+		return empList;
+	}
+
+	public List<EmployeePayRoll> readEmployeePayRollDetailsFromDatabase() {
+		List<EmployeePayRoll> empList = new ArrayList<EmployeePayRoll>();
+		Connection con = PayRollDatabaseConnector.getConnection();
+		try {
+			PreparedStatement pstmt = con.prepareStatement(
+					"select employee.employee_id, employee.name, basic_pay from employee join payroll on employee.employee_id=payroll.employee_id");
+			ResultSet rs = pstmt.executeQuery();
+			while (rs.next()) {
+				empList.add(new EmployeePayRoll(rs.getString("employee_id"), rs.getString("name"),
+						rs.getLong("basic_pay")));
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		EmployeePayRollMain.LOG.info("Details read successfully from payroll_service database");
 		return empList;
 	}
 }

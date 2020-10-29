@@ -17,14 +17,13 @@ public class EmployeePayRollMainTest {
 		EmployeePayRoll[] empArray = { new EmployeePayRoll("1", "Bill", 1000000),
 				new EmployeePayRoll("3", "Bezos", 2000000), new EmployeePayRoll("3", "Musk", 3000000) };
 		EmployeePayRollMain employeePayRollMain = new EmployeePayRollMain(Arrays.asList(empArray));
-		Long entriesCount = 0l;
+		Integer entriesCount = employeePayRollMain.employeePayRollList.size();
 		try {
 			employeePayRollMain.writeEmployeePayRollDetails(EmployeePayRollMain.IOService.FILE_IO);
-			entriesCount = employeePayRollMain.countEntries(EmployeePayRollMain.IOService.FILE_IO);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		assertEquals(Long.valueOf(3), entriesCount);
+		assertEquals(Integer.valueOf(3), entriesCount);
 	}
 
 	@Test
@@ -41,6 +40,19 @@ public class EmployeePayRollMainTest {
 			e.printStackTrace();
 		}
 		assertEquals(Integer.valueOf(3), entriesCount);
+	}
+
+	@Test
+	public void givenFourEmployeesInDB_ShouldMatchEmployeeEntries() {
+		EmployeePayRollMain employeePayRollMain = new EmployeePayRollMain();
+		Integer entriesCount = 0;
+		try {
+			employeePayRollMain.readEmployeePayRollDetails(EmployeePayRollMain.IOService.DB_IO);
+			entriesCount = employeePayRollMain.employeePayRollList.size();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		assertEquals(Integer.valueOf(4), entriesCount);
 	}
 
 }

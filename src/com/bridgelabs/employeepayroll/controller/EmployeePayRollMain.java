@@ -4,39 +4,38 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import com.bridgelabs.employeepayroll.model.*;
 
 public class EmployeePayRollMain {
 	public List<EmployeePayRoll> employeePayRollList;
-	public static BufferedWriter consoleWriter;
+	public static Logger LOG = LogManager.getLogger(EmployeePayRollMain.class);
 	public static BufferedReader consoleReader;
 
 	public EmployeePayRollMain() {
 		employeePayRollList = new ArrayList<EmployeePayRoll>();
-		consoleWriter = new BufferedWriter(new OutputStreamWriter(System.out));
 		consoleReader = new BufferedReader(new InputStreamReader(System.in));
 	}
 
 	public EmployeePayRollMain(List<EmployeePayRoll> employeePayRollList) {
 		this.employeePayRollList = employeePayRollList;
-		consoleWriter = new BufferedWriter(new OutputStreamWriter(System.out));
 		consoleReader = new BufferedReader(new InputStreamReader(System.in));
 	}
 
 	public enum IOService {
-		CONSOLE_IO, FILE_IO
+		CONSOLE_IO, FILE_IO, DB_IO
 	}
 
 	public static void main(String[] args) {
 		EmployeePayRollMain employeePayRollMain = new EmployeePayRollMain();
 		try {
-			consoleWriter.write("Welcome to Employee Payroll System!\n");
-			consoleWriter.flush();
+			LOG.info("Welcome to Employee Payroll System!\n");
 			int choice;
 			do {
-				consoleWriter.write(
+				LOG.info(
 						"Chooose one option:\n1. Read and add employee payRoll details from console\n2. Write employee payRoll details to console\n3. Wrie employee payRoll details to a file\n4. Print details from file\n5. Find no. of entries in file\n6. Read employee payRoll details from the file\n7. Exit\n");
-				consoleWriter.flush();
 				choice = Integer.parseInt(consoleReader.readLine());
 				switch (choice) {
 				case 1:
@@ -60,12 +59,10 @@ public class EmployeePayRollMain {
 					employeePayRollMain.readEmployeePayRollDetails(IOService.FILE_IO);
 					break;
 				case 7:
-					consoleWriter.write("Thanks for using our system!");
-					consoleWriter.flush();
+					LOG.info("Thanks for using our system!");
 					break;
 				default:
-					consoleWriter.write("Please enter valid choice!\n\n");
-					consoleWriter.flush();
+					LOG.info("Please enter valid choice!\n\n");
 					break;
 				}
 			} while (choice != 7);
@@ -73,7 +70,6 @@ public class EmployeePayRollMain {
 			e.printStackTrace();
 		} finally {
 			try {
-				consoleWriter.close();
 				consoleReader.close();
 			} catch (IOException e2) {
 				e2.printStackTrace();
@@ -84,26 +80,25 @@ public class EmployeePayRollMain {
 	// reads employee payroll details from console
 	public void readEmployeePayRollDetails(IOService ioService) throws IOException {
 		if (ioService.equals(IOService.CONSOLE_IO)) {
-			consoleWriter.write("Enter the employee Id: \n");
-			consoleWriter.flush();
+			LOG.info("Enter the employee Id: \n");
 			String id = consoleReader.readLine();
-			consoleWriter.write("Enter the employee name: \n");
-			consoleWriter.flush();
+			LOG.info("Enter the employee name: \n");
 			String name = consoleReader.readLine();
-			consoleWriter.write("Enter the employee salary: \n");
-			consoleWriter.flush();
+			LOG.info("Enter the employee salary: \n");
 			Long salary = Long.parseLong(consoleReader.readLine());
 			EmployeePayRoll employeePayRoll = new EmployeePayRoll(id, name, salary);
 			employeePayRollList.add(employeePayRoll);
-		} else {
-			this.employeePayRollList = new EmployeePayRollService().readEmployeePayRollDetailsFromFile();
 		}
+		if (ioService.equals(IOService.FILE_IO))
+			this.employeePayRollList = new EmployeePayRollService().readEmployeePayRollDetailsFromFile();
+		else
+			this.employeePayRollList = new EmployeePayRollService().readEmployeePayRollDetailsFromDatabase();
 	}
 
 	// writes employee payroll details to console
 	public void writeEmployeePayRollDetails(IOService ioService) throws IOException {
 		if (ioService.equals(IOService.CONSOLE_IO))
-			consoleWriter.write(employeePayRollList.toString());
+			LOG.info(employeePayRollList.toString());
 		else
 			new EmployeePayRollService().writeEmployeePayRollDetailsToFile(employeePayRollList);
 	}
@@ -114,8 +109,7 @@ public class EmployeePayRollMain {
 		if (ioService.equals(IOService.FILE_IO)) {
 			entriesCount = new EmployeePayRollService().countEntries();
 		}
-		consoleWriter.write("No. of entries in the file: " + entriesCount + "\n");
-		consoleWriter.flush();
+		LOG.info("No. of entries in the file: " + entriesCount);
 		return entriesCount;
 	}
 
