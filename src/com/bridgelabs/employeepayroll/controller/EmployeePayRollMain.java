@@ -118,4 +118,8 @@ public class EmployeePayRollMain {
 		if (ioService.equals(IOService.FILE_IO))
 			new EmployeePayRollService().printDetails();
 	}
+
+	public boolean updateEmployeePayRollDetails(IOService ioService) throws IOException {
+		return new EmployeePayRollService().updateDetailsinDatabase();
+	}
 }

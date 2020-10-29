@@ -1,6 +1,7 @@
 package com.bridgelabs.employeepayroll.tester;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -53,5 +54,17 @@ public class EmployeePayRollMainTest {
 			e.printStackTrace();
 		}
 		assertEquals(Integer.valueOf(4), entriesCount);
+	}
+
+	@Test
+	public void updatedBasePayForTerissa_ShouldRetrurnUpdatedBasePay() {
+		EmployeePayRollMain employeePayRollMain = new EmployeePayRollMain();
+		boolean response=false;
+		try {
+			response = employeePayRollMain.updateEmployeePayRollDetails(EmployeePayRollMain.IOService.DB_IO);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		assertTrue(response);
 	}
 }

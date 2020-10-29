@@ -85,4 +85,27 @@ public class EmployeePayRollService {
 		EmployeePayRollMain.LOG.info("Details read successfully from database");
 		return empList;
 	}
+
+	// updates details in database
+	public boolean updateDetailsinDatabase() {
+		Connection con = PayRollDatabaseConnector.getConnection();
+		try {
+			String query = "update employee join payroll set basic_pay=?,taxable_pay=basic_pay-deductions,net_pay=taxable_pay-tax where employee.name=?";
+			PreparedStatement pstmt = con.prepareStatement(query);
+			pstmt.setLong(1, 3000000);
+			pstmt.setString(2, "Terissa");
+			int status = pstmt.executeUpdate();
+			query = "select basic_pay from employee join payroll where employee.name=?";
+			pstmt = con.prepareStatement(query);
+			pstmt.setString(1, "Terissa");
+			ResultSet rs = pstmt.executeQuery();
+			EmployeePayRollMain.LOG.info("Details updated successfully to database");
+			if (rs.next())
+				return (rs.getLong("basic_pay") == 3000000l && status > 0);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		EmployeePayRollMain.LOG.info("Details not updated");
+		return false;
+	}
 }
