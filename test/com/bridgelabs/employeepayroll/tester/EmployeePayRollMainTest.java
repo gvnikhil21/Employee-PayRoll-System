@@ -1,15 +1,15 @@
 package com.bridgelabs.employeepayroll.tester;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
-import java.io.IOException;
 import java.util.Arrays;
+import java.util.List;
 
 import org.junit.Test;
 
 import com.bridgelabs.employeepayroll.controller.*;
 import com.bridgelabs.employeepayroll.model.EmployeePayRoll;
+import com.bridgelabs.employeepayroll.model.EmployeePayRollException;
 
 public class EmployeePayRollMainTest {
 
@@ -21,7 +21,7 @@ public class EmployeePayRollMainTest {
 		Integer entriesCount = employeePayRollMain.employeePayRollList.size();
 		try {
 			employeePayRollMain.writeEmployeePayRollDetails(EmployeePayRollMain.IOService.FILE_IO);
-		} catch (IOException e) {
+		} catch (EmployeePayRollException e) {
 			e.printStackTrace();
 		}
 		assertEquals(Integer.valueOf(3), entriesCount);
@@ -37,7 +37,7 @@ public class EmployeePayRollMainTest {
 			employeePayRollMain.writeEmployeePayRollDetails(EmployeePayRollMain.IOService.FILE_IO);
 			employeePayRollMain.readEmployeePayRollDetails(EmployeePayRollMain.IOService.FILE_IO);
 			entriesCount = employeePayRollMain.employeePayRollList.size();
-		} catch (IOException e) {
+		} catch (EmployeePayRollException e) {
 			e.printStackTrace();
 		}
 		assertEquals(Integer.valueOf(3), entriesCount);
@@ -50,7 +50,7 @@ public class EmployeePayRollMainTest {
 		try {
 			employeePayRollMain.readEmployeePayRollDetails(EmployeePayRollMain.IOService.DB_IO);
 			entriesCount = employeePayRollMain.employeePayRollList.size();
-		} catch (IOException e) {
+		} catch (EmployeePayRollException e) {
 			e.printStackTrace();
 		}
 		assertEquals(Integer.valueOf(4), entriesCount);
@@ -59,12 +59,16 @@ public class EmployeePayRollMainTest {
 	@Test
 	public void updatedBasePayForTerissa_ShouldRetrurnUpdatedBasePay() {
 		EmployeePayRollMain employeePayRollMain = new EmployeePayRollMain();
-		boolean response=false;
+		EmployeePayRoll employee = null;
 		try {
-			response = employeePayRollMain.updateEmployeePayRollDetails(EmployeePayRollMain.IOService.DB_IO);
-		} catch (IOException e) {
+			employeePayRollMain.updateEmployeePayRollDetails(EmployeePayRollMain.IOService.DB_IO);
+			employeePayRollMain.readEmployeePayRollDetails(EmployeePayRollMain.IOService.DB_IO);
+			List<EmployeePayRoll> empList = employeePayRollMain.employeePayRollList;
+			employee = empList.stream().filter(emp -> emp.getEmpName().equalsIgnoreCase("Terissa")).findFirst()
+					.orElse(null);
+		} catch (EmployeePayRollException e) {
 			e.printStackTrace();
 		}
-		assertTrue(response);
+		assertEquals(Long.valueOf(3000000), Long.valueOf(employee.getEmpSalary()));
 	}
 }
