@@ -14,6 +14,7 @@ import com.bridgelabs.employeepayroll.model.EmployeePayRollException;
 public class EmployeePayRollDBService {
 	private static Connection con;
 	private static PreparedStatement empStatement;
+	private static ResultSet resultSet;
 	private static EmployeePayRollDBService employeePayRollDBService;
 
 	// no-arg constructor made private to ensure singleton property
@@ -38,11 +39,7 @@ public class EmployeePayRollDBService {
 		try {
 			empStatement = con.prepareStatement(
 					"select employee.employee_id, employee.name, basic_pay from employee join payroll on employee.employee_id=payroll.employee_id");
-			ResultSet rs = empStatement.executeQuery();
-			while (rs.next()) {
-				empList.add(new EmployeePayRoll(rs.getString("employee_id"), rs.getString("name"),
-						rs.getLong("basic_pay")));
-			}
+			empList = getDataInDB();
 		} catch (SQLException e) {
 			throw new EmployeePayRollException(e.getMessage());
 		}
@@ -51,12 +48,12 @@ public class EmployeePayRollDBService {
 	}
 
 	// updates details in database
-	public void updateBasicPayDetailsInDatabase() throws EmployeePayRollException {
+	public void updateBasicPayDetailsInDatabase(Long basic_pay, String name) throws EmployeePayRollException {
 		try {
-			String query = "update employee join payroll on employee.employee_id= payroll.employee_id set basic_pay=? where employee.name=?";
+			String query = "update employee e join payroll p on e.employee_id= p.employee_id set basic_pay=? where e.name=?";
 			empStatement = con.prepareStatement(query);
-			empStatement.setLong(1, 3000000);
-			empStatement.setString(2, "Terissa");
+			empStatement.setLong(1, basic_pay);
+			empStatement.setString(2, name);
 			int status = empStatement.executeUpdate();
 			if (status > 0)
 				EmployeePayRollMain.LOG.info("Details updated successfully to database");
@@ -65,5 +62,36 @@ public class EmployeePayRollDBService {
 		} catch (SQLException e) {
 			throw new EmployeePayRollException(e.getMessage());
 		}
+	}
+
+	// retrieve all employee pay-roll details who started between certain date range
+	public List<EmployeePayRoll> retrieveEmployeePayRollDetails(String start, String end)
+			throws EmployeePayRollException {
+		List<EmployeePayRoll> empList = new ArrayList<EmployeePayRoll>();
+		try {
+			empStatement = con.prepareStatement(
+					"select * from employee e join payroll p on e.employee_id=p.employee_id where start_date between cast(? as date) and cast(? as date)");
+			empStatement.setString(1, start);
+			empStatement.setString(2, end);
+			empList = getDataInDB();
+		} catch (SQLException e) {
+			throw new EmployeePayRollException(e.getMessage());
+		}
+		return empList;
+	}
+
+	// returns employee payroll data in database
+	private List<EmployeePayRoll> getDataInDB() throws EmployeePayRollException {
+		List<EmployeePayRoll> empList = new ArrayList<EmployeePayRoll>();
+		try {
+			resultSet = empStatement.executeQuery();
+			while (resultSet.next()) {
+				empList.add(new EmployeePayRoll(resultSet.getString("employee_id"), resultSet.getString("name"),
+						resultSet.getLong("basic_pay")));
+			}
+		} catch (SQLException e) {
+			throw new EmployeePayRollException(e.getMessage());
+		}
+		return empList;
 	}
 }

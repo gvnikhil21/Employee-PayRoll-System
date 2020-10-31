@@ -103,8 +103,9 @@ public class EmployeePayRollMain {
 	}
 
 	// update employee payroll-details in database
-	public void updateEmployeePayRollDetails(IOService ioService) throws EmployeePayRollException {
-		EmployeePayRollDBService.getInstance().updateBasicPayDetailsInDatabase();
+	public void updateEmployeePayRollDetails(IOService ioService, Long basic_pay, String name)
+			throws EmployeePayRollException {
+		EmployeePayRollDBService.getInstance().updateBasicPayDetailsInDatabase(basic_pay, name);
 	}
 
 	// writes employee payroll details to console or file or database
@@ -113,6 +114,12 @@ public class EmployeePayRollMain {
 			LOG.info(employeePayRollList.toString());
 		if (ioService.equals(IOService.FILE_IO))
 			new EmployeePayRollIOService().writeEmployeePayRollDetailsToFile(employeePayRollList);
+	}
+
+	// retrieves employee pay roll details who started between certain date range
+	public List<EmployeePayRoll> getEmployeePayRollDataForParticularDates(String start, String end)
+			throws EmployeePayRollException {
+		return EmployeePayRollDBService.getInstance().retrieveEmployeePayRollDetails(start, end);
 	}
 
 	// counts no. of entries in file

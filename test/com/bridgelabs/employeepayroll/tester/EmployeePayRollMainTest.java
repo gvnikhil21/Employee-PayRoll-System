@@ -61,7 +61,7 @@ public class EmployeePayRollMainTest {
 		EmployeePayRollMain employeePayRollMain = new EmployeePayRollMain();
 		EmployeePayRoll employee = null;
 		try {
-			employeePayRollMain.updateEmployeePayRollDetails(EmployeePayRollMain.IOService.DB_IO);
+			employeePayRollMain.updateEmployeePayRollDetails(EmployeePayRollMain.IOService.DB_IO, 3000000l, "Terissa");
 			employeePayRollMain.readEmployeePayRollDetails(EmployeePayRollMain.IOService.DB_IO);
 			List<EmployeePayRoll> empList = employeePayRollMain.employeePayRollList;
 			employee = empList.stream().filter(emp -> emp.getEmpName().equalsIgnoreCase("Terissa")).findFirst()
@@ -70,5 +70,19 @@ public class EmployeePayRollMainTest {
 			e.printStackTrace();
 		}
 		assertEquals(Long.valueOf(3000000), Long.valueOf(employee.getEmpSalary()));
+	}
+
+	@Test
+	public void retrieveData_GivenParticularDateRange_ShouldReturnCorrectEntries() {
+		EmployeePayRollMain employeePayRollMain = new EmployeePayRollMain();
+		Integer entriesCount = 0;
+		try {
+			List<EmployeePayRoll> empList = employeePayRollMain.getEmployeePayRollDataForParticularDates("2013-01-01",
+					"2015-12-31");
+			entriesCount = empList.size();
+		} catch (EmployeePayRollException e) {
+			e.printStackTrace();
+		}
+		assertEquals(Integer.valueOf(3), entriesCount);
 	}
 }
