@@ -4,6 +4,7 @@ public class EmployeePayRoll {
 	private String empId;
 	private String empName;
 	private long empSalary;
+	private char gender;
 
 	// no-argument constructor
 	public EmployeePayRoll() {
@@ -14,6 +15,11 @@ public class EmployeePayRoll {
 		this.empId = empId;
 		this.empName = empName;
 		this.empSalary = empSalary;
+	}
+
+	public EmployeePayRoll(String empId, String empName, long empSalary, char gender) {
+		this(empId, empName, empSalary);
+		this.gender = gender;
 	}
 
 	// getters and setters
@@ -39,6 +45,10 @@ public class EmployeePayRoll {
 
 	public void setEmpSalary(long empSalary) {
 		this.empSalary = empSalary;
+	}
+
+	public char getGender() {
+		return gender;
 	}
 
 	@Override

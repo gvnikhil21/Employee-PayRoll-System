@@ -122,6 +122,21 @@ public class EmployeePayRollMain {
 		return EmployeePayRollDBService.getInstance().retrieveEmployeePayRollDetails(start, end);
 	}
 
+	// returns the average salary by gender from database
+	public long getAvgSalaryByGenderFromDB(char gender) throws EmployeePayRollException {
+		return EmployeePayRollDBService.getInstance().getAvgSalaryByGender(gender);
+	}
+
+	// returns the sum of salary by gender from database
+	public long getTotalSalaryByGenderFromDB(char gender) throws EmployeePayRollException {
+		return EmployeePayRollDBService.getInstance().getTotalSalaryByGender(gender);
+	}
+
+	// returns no of employees in database by gender
+	public long getCountOfEmployeesByGenderFromDB(char gender) throws EmployeePayRollException {
+		return EmployeePayRollDBService.getInstance().getCountOfEmployeesByGender(gender);
+	}
+
 	// counts no. of entries in file
 	public long countEntries(IOService ioService) throws EmployeePayRollException {
 		long entriesCount = 0;
