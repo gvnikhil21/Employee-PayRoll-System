@@ -33,6 +33,8 @@ public class EmployeePayRollDBService {
 	// adds payroll details to database
 	public boolean addEmployeePayRollDetails(EmployeePayRoll employeePayRoll) throws EmployeePayRollException {
 		Connection con = null;
+
+		// adding to employee table
 		try {
 			con = PayRollDatabaseConnector.getConnection();
 			con.setAutoCommit(false);
@@ -61,6 +63,7 @@ public class EmployeePayRollDBService {
 			}
 		}
 
+		// adding to payroll table
 		try {
 			con.setAutoCommit(false);
 			empStatement = con.prepareStatement(
@@ -90,6 +93,7 @@ public class EmployeePayRollDBService {
 			}
 		}
 
+		// committing
 		try {
 			con.commit();
 		} catch (SQLException e) {
