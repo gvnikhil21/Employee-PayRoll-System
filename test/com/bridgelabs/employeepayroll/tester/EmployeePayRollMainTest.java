@@ -2,6 +2,7 @@ package com.bridgelabs.employeepayroll.tester;
 
 import static org.junit.Assert.assertEquals;
 
+import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
 
@@ -154,5 +155,20 @@ public class EmployeePayRollMainTest {
 		}
 		assertEquals(femaleCount, actualFemaleCount);
 		assertEquals(maleCount, actualMaleCount);
+	}
+
+	@Test
+	public void givenNewEmployee_WhenAdded_ShouldBeInSyncWithDB() {
+		EmployeePayRollMain employeePayRollMain = new EmployeePayRollMain();
+		EmployeePayRoll employeePayRoll = null;
+		EmployeePayRoll actualEmployeePayRoll = new EmployeePayRoll("Bezos", 5000000, 'M', LocalDate.now(), "1");
+		try {
+			employeePayRollMain.addEmployeePayRollDetailsToDB(actualEmployeePayRoll);
+			employeePayRoll = employeePayRollMain.employeePayRollList.stream()
+					.filter(emp -> emp.getEmpName().equals("Bezos")).findFirst().orElse(null);
+		} catch (EmployeePayRollException e) {
+			e.printStackTrace();
+		}
+		assertEquals(employeePayRoll, actualEmployeePayRoll);
 	}
 }

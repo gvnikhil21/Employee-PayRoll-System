@@ -116,6 +116,12 @@ public class EmployeePayRollMain {
 			new EmployeePayRollIOService().writeEmployeePayRollDetailsToFile(employeePayRollList);
 	}
 
+	// adds employee payroll object to database and employee pay roll list
+	public void addEmployeePayRollDetailsToDB(EmployeePayRoll employeePayRoll) throws EmployeePayRollException {
+		if (EmployeePayRollDBService.getInstance().addEmployeePayRollDetails(employeePayRoll))
+			employeePayRollList.add(employeePayRoll);
+	}
+
 	// retrieves employee pay roll details who started between certain date range
 	public List<EmployeePayRoll> getEmployeePayRollDataForParticularDates(String start, String end)
 			throws EmployeePayRollException {

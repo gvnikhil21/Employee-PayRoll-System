@@ -1,9 +1,11 @@
 package com.bridgelabs.employeepayroll.controller;
 
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,6 +33,29 @@ public class EmployeePayRollDBService {
 		if (employeePayRollDBService == null)
 			employeePayRollDBService = new EmployeePayRollDBService();
 		return employeePayRollDBService;
+	}
+
+	// adds payroll details to database
+	public boolean addEmployeePayRollDetails(EmployeePayRoll employeePayRoll) throws EmployeePayRollException {
+		try {
+			empStatement = con.prepareStatement(
+					"insert into employee (name,gender,start_date,company_id) values (?,?,?,?)",
+					Statement.RETURN_GENERATED_KEYS);
+			empStatement.setString(1, employeePayRoll.getEmpName());
+			empStatement.setString(2, String.valueOf(employeePayRoll.getGender()));
+			empStatement.setDate(3, Date.valueOf(employeePayRoll.getStartDate()));
+			empStatement.setString(4, employeePayRoll.getCompany_id());
+			int rowAffected = empStatement.executeUpdate();
+			if (rowAffected > 0) {
+				resultSet = empStatement.getGeneratedKeys();
+				if (resultSet.next())
+					employeePayRoll.setEmpId(String.valueOf(resultSet.getInt("employee_id")));
+				return true;
+			}
+			return false;
+		} catch (SQLException e) {
+			throw new EmployeePayRollException(e.getMessage());
+		}
 	}
 
 	// reads employee payRoll details from database

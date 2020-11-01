@@ -1,10 +1,14 @@
 package com.bridgelabs.employeepayroll.model;
 
+import java.time.LocalDate;
+
 public class EmployeePayRoll {
 	private String empId;
 	private String empName;
 	private long empSalary;
 	private char gender;
+	private LocalDate startDate;
+	private String company_id;
 
 	// no-argument constructor
 	public EmployeePayRoll() {
@@ -20,6 +24,21 @@ public class EmployeePayRoll {
 	public EmployeePayRoll(String empId, String empName, long empSalary, char gender) {
 		this(empId, empName, empSalary);
 		this.gender = gender;
+	}
+
+	public EmployeePayRoll(String empName, long empSalary, char gender, LocalDate startDate, String company_id) {
+		this.empName = empName;
+		this.empSalary = empSalary;
+		this.gender = gender;
+		this.startDate = startDate;
+		this.company_id = company_id;
+	}
+
+	public EmployeePayRoll(String empId, String empName, long empSalary, char gender, LocalDate startDate,
+			String company_id) {
+		this(empId, empName, empSalary, gender);
+		this.startDate = startDate;
+		this.company_id = company_id;
 	}
 
 	// getters and setters
@@ -49,6 +68,26 @@ public class EmployeePayRoll {
 
 	public char getGender() {
 		return gender;
+	}
+
+	public void setGender(char gender) {
+		this.gender = gender;
+	}
+
+	public LocalDate getStartDate() {
+		return startDate;
+	}
+
+	public void setStartDate(LocalDate startDate) {
+		this.startDate = startDate;
+	}
+
+	public String getCompany_id() {
+		return company_id;
+	}
+
+	public void setCompany_id(String company_id) {
+		this.company_id = company_id;
 	}
 
 	@Override
