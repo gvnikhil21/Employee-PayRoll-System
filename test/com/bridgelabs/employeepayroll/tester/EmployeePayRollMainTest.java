@@ -161,7 +161,9 @@ public class EmployeePayRollMainTest {
 	public void givenNewEmployee_WhenAdded_ShouldBeInSyncWithDB() {
 		EmployeePayRollMain employeePayRollMain = new EmployeePayRollMain();
 		EmployeePayRoll employeePayRoll = null;
-		EmployeePayRoll actualEmployeePayRoll = new EmployeePayRoll("Bezos", 5000000, 'M', LocalDate.now(), "1");
+		String DepartmentId[] = { "1", "3" };
+		EmployeePayRoll actualEmployeePayRoll = new EmployeePayRoll("Bezos", 5000000, 'M', LocalDate.now(), "1",
+				DepartmentId);
 		try {
 			employeePayRollMain.addEmployeePayRollDetailsToDB(actualEmployeePayRoll);
 			employeePayRoll = employeePayRollMain.employeePayRollList.stream()

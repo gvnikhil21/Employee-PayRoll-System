@@ -65,16 +65,14 @@ public class EmployeePayRollDBService {
 
 		// adding to payroll table
 		try {
-			con.setAutoCommit(false);
 			empStatement = con.prepareStatement(
-					"insert into payroll (employee_id,basic_pay,deductions,taxable_pay,tax,net_pay) values (?,?,?,?,?,?)",
-					Statement.RETURN_GENERATED_KEYS);
+					"insert into payroll (employee_id,basic_pay,deductions,taxable_pay,tax,net_pay) values (?,?,?,?,?,?)");
 			BigDecimal basic_pay = BigDecimal.valueOf(employeePayRoll.getEmpSalary());
 			BigDecimal deductions = basic_pay.multiply(BigDecimal.valueOf(0.2));
 			BigDecimal taxable_pay = basic_pay.subtract(deductions);
 			BigDecimal tax = taxable_pay.multiply(BigDecimal.valueOf(0.1));
 			BigDecimal net_pay = taxable_pay.subtract(tax);
-			empStatement.setString(1, employeePayRoll.getEmpId());
+			empStatement.setInt(1, Integer.valueOf(employeePayRoll.getEmpId()));
 			empStatement.setBigDecimal(2, basic_pay);
 			empStatement.setBigDecimal(3, deductions);
 			empStatement.setBigDecimal(4, taxable_pay);
@@ -83,6 +81,27 @@ public class EmployeePayRollDBService {
 			int rowAffected = empStatement.executeUpdate();
 			if (rowAffected == 0)
 				return false;
+		} catch (SQLException e) {
+			e.printStackTrace();
+			try {
+				con.rollback();
+				return false;
+			} catch (SQLException e1) {
+				throw new EmployeePayRollException(e1.getMessage());
+			}
+		}
+
+		// adding to employee_department table
+		try {
+			for (String deptId : employeePayRoll.getDepartment()) {
+				empStatement = con
+						.prepareStatement("insert into employee_department (employee_id,department_id) values (?,?)");
+				empStatement.setInt(1, Integer.valueOf(employeePayRoll.getEmpId()));
+				empStatement.setInt(2, Integer.valueOf(deptId));
+				int rowsAffected = empStatement.executeUpdate();
+				if (rowsAffected == 0)
+					return false;
+			}
 		} catch (SQLException e) {
 			e.printStackTrace();
 			try {
@@ -131,9 +150,15 @@ public class EmployeePayRollDBService {
 			empStatement.setLong(1, basic_pay);
 			empStatement.setString(2, name);
 			int status = empStatement.executeUpdate();
-			if (status > 0)
-				EmployeePayRollMain.LOG.info("Details updated successfully to database");
-			else
+			if (status > 0) {
+				query = "update payroll set deductions=0.2*basic_pay,taxable_pay=basic_pay-deductions,tax=0.1*taxable_pay,net_pay=taxable_pay-tax";
+				empStatement = con.prepareStatement(query);
+				status = empStatement.executeUpdate();
+				if (status > 0)
+					EmployeePayRollMain.LOG.info("Details updated successfully to database");
+				else
+					EmployeePayRollMain.LOG.info("Details not updated");
+			} else
 				EmployeePayRollMain.LOG.info("Details not updated");
 		} catch (SQLException e) {
 			throw new EmployeePayRollException(e.getMessage());

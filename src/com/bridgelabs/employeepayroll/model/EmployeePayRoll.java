@@ -9,6 +9,7 @@ public class EmployeePayRoll {
 	private char gender;
 	private LocalDate startDate;
 	private String company_id;
+	private String department[];
 
 	// no-argument constructor
 	public EmployeePayRoll() {
@@ -26,6 +27,19 @@ public class EmployeePayRoll {
 		this.gender = gender;
 	}
 
+	public EmployeePayRoll(String empId, String empName, long empSalary, char gender, LocalDate startDate,
+			String company_id) {
+		this(empId, empName, empSalary, gender);
+		this.startDate = startDate;
+		this.company_id = company_id;
+	}
+
+	public EmployeePayRoll(String empId, String empName, long empSalary, char gender, LocalDate startDate,
+			String company_id, String[] department) {
+		this(empId, empName, empSalary, gender, startDate, company_id);
+		this.department = department;
+	}
+
 	public EmployeePayRoll(String empName, long empSalary, char gender, LocalDate startDate, String company_id) {
 		this.empName = empName;
 		this.empSalary = empSalary;
@@ -34,11 +48,10 @@ public class EmployeePayRoll {
 		this.company_id = company_id;
 	}
 
-	public EmployeePayRoll(String empId, String empName, long empSalary, char gender, LocalDate startDate,
-			String company_id) {
-		this(empId, empName, empSalary, gender);
-		this.startDate = startDate;
-		this.company_id = company_id;
+	public EmployeePayRoll(String empName, long empSalary, char gender, LocalDate startDate, String company_id,
+			String[] department) {
+		this(empName, empSalary, gender, startDate, company_id);
+		this.department = department;
 	}
 
 	// getters and setters
@@ -88,6 +101,14 @@ public class EmployeePayRoll {
 
 	public void setCompany_id(String company_id) {
 		this.company_id = company_id;
+	}
+
+	public String[] getDepartment() {
+		return department;
+	}
+
+	public void setDepartment(String[] department) {
+		this.department = department;
 	}
 
 	@Override
