@@ -138,17 +138,17 @@ public class EmployeePayRollMain {
 
 	// returns the average salary by gender from database
 	public long getAvgSalaryByGenderFromDB(char gender) throws EmployeePayRollException {
-		return EmployeePayRollDBService.getInstance().getAvgSalaryByGender(gender);
+		return EmployeePayRollDBServiceFunc.getInstance().getAvgSalaryByGender(gender);
 	}
 
 	// returns the sum of salary by gender from database
 	public long getTotalSalaryByGenderFromDB(char gender) throws EmployeePayRollException {
-		return EmployeePayRollDBService.getInstance().getTotalSalaryByGender(gender);
+		return EmployeePayRollDBServiceFunc.getInstance().getTotalSalaryByGender(gender);
 	}
 
 	// returns no of employees in database by gender
 	public long getCountOfEmployeesByGenderFromDB(char gender) throws EmployeePayRollException {
-		return EmployeePayRollDBService.getInstance().getCountOfEmployeesByGender(gender);
+		return EmployeePayRollDBServiceFunc.getInstance().getCountOfEmployeesByGender(gender);
 	}
 
 	// counts no. of entries in file
