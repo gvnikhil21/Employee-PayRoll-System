@@ -10,6 +10,7 @@ public class EmployeePayRoll {
 	private LocalDate startDate;
 	private String company_id;
 	private String department[];
+	private boolean isActive = true;
 
 	// no-argument constructor
 	public EmployeePayRoll() {
@@ -26,7 +27,7 @@ public class EmployeePayRoll {
 		this(empId, empName, empSalary);
 		this.gender = gender;
 	}
-	
+
 	public EmployeePayRoll(String empId, String empName, long empSalary, char gender, LocalDate startDate,
 			String company_id) {
 		this(empId, empName, empSalary, gender);
@@ -109,6 +110,14 @@ public class EmployeePayRoll {
 
 	public void setDepartment(String[] department) {
 		this.department = department;
+	}
+
+	public boolean isActive() {
+		return isActive;
+	}
+
+	public void setActive(boolean isActive) {
+		this.isActive = isActive;
 	}
 
 	@Override

@@ -6,17 +6,20 @@ import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
 
+import org.junit.FixMethodOrder;
 import org.junit.Test;
+import org.junit.runners.MethodSorters;
 
 import com.bridgelabs.employeepayroll.controller.*;
 import com.bridgelabs.employeepayroll.controller.EmployeePayRollMain.IOService;
 import com.bridgelabs.employeepayroll.model.EmployeePayRoll;
 import com.bridgelabs.employeepayroll.model.EmployeePayRollException;
 
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class EmployeePayRollMainTest {
 
 	@Test
-	public void givenThreeEmployees_WhenWrittenToFile_ShouldMatchEmployeeEntries() {
+	public void test1_givenThreeEmployees_WhenWrittenToFile_ShouldMatchEmployeeEntries() {
 		EmployeePayRoll[] empArray = { new EmployeePayRoll("1", "Bill", 1000000),
 				new EmployeePayRoll("3", "Bezos", 2000000), new EmployeePayRoll("3", "Musk", 3000000) };
 		EmployeePayRollMain employeePayRollMain = new EmployeePayRollMain(Arrays.asList(empArray));
@@ -30,7 +33,7 @@ public class EmployeePayRollMainTest {
 	}
 
 	@Test
-	public void givenThreeEmployees_WhenReadFromFile_ShouldMatchEmployeeEntries() {
+	public void test2_givenThreeEmployees_WhenReadFromFile_ShouldMatchEmployeeEntries() {
 		EmployeePayRoll[] empArray = { new EmployeePayRoll("1", "Bill", 1000000),
 				new EmployeePayRoll("3", "Bezos", 2000000), new EmployeePayRoll("3", "Musk", 3000000) };
 		EmployeePayRollMain employeePayRollMain = new EmployeePayRollMain(Arrays.asList(empArray));
@@ -46,7 +49,7 @@ public class EmployeePayRollMainTest {
 	}
 
 	@Test
-	public void givenFourEmployeesInDB_ShouldMatchEmployeeEntries() {
+	public void test3_givenFourEmployeesInDB_ShouldMatchEmployeeEntries() {
 		EmployeePayRollMain employeePayRollMain = new EmployeePayRollMain();
 		Integer entriesCount = 0;
 		try {
@@ -59,7 +62,7 @@ public class EmployeePayRollMainTest {
 	}
 
 	@Test
-	public void updatedBasePayForTerissa_ShouldRetrurnUpdatedBasePay() {
+	public void test4_updatedBasePayForTerissa_ShouldRetrurnUpdatedBasePay() {
 		EmployeePayRollMain employeePayRollMain = new EmployeePayRollMain();
 		EmployeePayRoll employee = null;
 		try {
@@ -75,7 +78,7 @@ public class EmployeePayRollMainTest {
 	}
 
 	@Test
-	public void retrieveData_GivenParticularDateRange_ShouldReturnCorrectEntries() {
+	public void test5_retrieveData_GivenParticularDateRange_ShouldReturnCorrectEntries() {
 		EmployeePayRollMain employeePayRollMain = new EmployeePayRollMain();
 		Integer entriesCount = 0;
 		try {
@@ -89,7 +92,7 @@ public class EmployeePayRollMainTest {
 	}
 
 	@Test
-	public void calculatedAvgSalaryByGenderFromDB_ShouldSyncWithAvgSalaryByGenderFromList() {
+	public void test6_calculatedAvgSalaryByGenderFromDB_ShouldSyncWithAvgSalaryByGenderFromList() {
 		EmployeePayRollMain employeePayRollMain = new EmployeePayRollMain();
 		Long femaleAvgSalary = 0l;
 		Long actualFemaleSalary = 0l;
@@ -100,12 +103,12 @@ public class EmployeePayRollMainTest {
 			List<EmployeePayRoll> empList = employeePayRollMain.employeePayRollList;
 			femaleAvgSalary = employeePayRollMain.getAvgSalaryByGenderFromDB('F');
 			maleAvgSalary = employeePayRollMain.getAvgSalaryByGenderFromDB('M');
-			actualFemaleSalary = (empList.stream().filter(emp -> emp.getGender() == 'F')
+			actualFemaleSalary = (empList.stream().filter(emp -> emp.getGender() == 'F' && emp.isActive())
 					.mapToLong(EmployeePayRoll::getEmpSalary).reduce(0, (emp1, emp2) -> emp1 + emp2))
-					/ empList.stream().filter(emp -> emp.getGender() == 'F').count();
-			actualMaleSalary = (empList.stream().filter(emp -> emp.getGender() == 'M')
+					/ empList.stream().filter(emp -> emp.getGender() == 'F' && emp.isActive()).count();
+			actualMaleSalary = (empList.stream().filter(emp -> emp.getGender() == 'M' && emp.isActive())
 					.mapToLong(EmployeePayRoll::getEmpSalary).reduce(0, (emp1, emp2) -> emp1 + emp2))
-					/ empList.stream().filter(emp -> emp.getGender() == 'M').count();
+					/ empList.stream().filter(emp -> emp.getGender() == 'M' && emp.isActive()).count();
 		} catch (EmployeePayRollException e) {
 			e.printStackTrace();
 		}
@@ -114,7 +117,7 @@ public class EmployeePayRollMainTest {
 	}
 
 	@Test
-	public void calculatedTotalSalaryByGenderFromDB_ShouldSyncWithTotalSalaryByGenderFromList() {
+	public void test7_calculatedTotalSalaryByGenderFromDB_ShouldSyncWithTotalSalaryByGenderFromList() {
 		EmployeePayRollMain employeePayRollMain = new EmployeePayRollMain();
 		Long femaleSalary = 0l;
 		Long actualFemaleSalary = 0l;
@@ -125,9 +128,9 @@ public class EmployeePayRollMainTest {
 			List<EmployeePayRoll> empList = employeePayRollMain.employeePayRollList;
 			femaleSalary = employeePayRollMain.getTotalSalaryByGenderFromDB('F');
 			maleSalary = employeePayRollMain.getTotalSalaryByGenderFromDB('M');
-			actualFemaleSalary = empList.stream().filter(emp -> emp.getGender() == 'F')
+			actualFemaleSalary = empList.stream().filter(emp -> emp.getGender() == 'F' && emp.isActive())
 					.mapToLong(EmployeePayRoll::getEmpSalary).reduce(0, (emp1, emp2) -> emp1 + emp2);
-			actualMaleSalary = empList.stream().filter(emp -> emp.getGender() == 'M')
+			actualMaleSalary = empList.stream().filter(emp -> emp.getGender() == 'M' && emp.isActive())
 					.mapToLong(EmployeePayRoll::getEmpSalary).reduce(0, (emp1, emp2) -> emp1 + emp2);
 		} catch (EmployeePayRollException e) {
 			e.printStackTrace();
@@ -137,7 +140,7 @@ public class EmployeePayRollMainTest {
 	}
 
 	@Test
-	public void calculatedTotalEMployeesyByGenderFromDB_ShouldSyncWithTotalEmployeesByGenderFromList() {
+	public void test8_calculatedTotalEMployeesyByGenderFromDB_ShouldSyncWithTotalEmployeesByGenderFromList() {
 		EmployeePayRollMain employeePayRollMain = new EmployeePayRollMain();
 		Long femaleCount = 0l;
 		Long actualFemaleCount = 0l;
@@ -148,8 +151,8 @@ public class EmployeePayRollMainTest {
 			List<EmployeePayRoll> empList = employeePayRollMain.employeePayRollList;
 			femaleCount = employeePayRollMain.getCountOfEmployeesByGenderFromDB('F');
 			maleCount = employeePayRollMain.getCountOfEmployeesByGenderFromDB('M');
-			actualFemaleCount = empList.stream().filter(emp -> emp.getGender() == 'F').count();
-			actualMaleCount = empList.stream().filter(emp -> emp.getGender() == 'M').count();
+			actualFemaleCount = empList.stream().filter(emp -> emp.getGender() == 'F' && emp.isActive()).count();
+			actualMaleCount = empList.stream().filter(emp -> emp.getGender() == 'M' && emp.isActive()).count();
 		} catch (EmployeePayRollException e) {
 			e.printStackTrace();
 		}
@@ -158,7 +161,7 @@ public class EmployeePayRollMainTest {
 	}
 
 	@Test
-	public void givenNewEmployee_WhenAdded_ShouldBeInSyncWithDB() {
+	public void test90_givenNewEmployee_WhenAdded_ShouldBeInSyncWithDB() {
 		EmployeePayRollMain employeePayRollMain = new EmployeePayRollMain();
 		EmployeePayRoll employeePayRoll = null;
 		String DepartmentId[] = { "1", "3" };
@@ -172,5 +175,19 @@ public class EmployeePayRollMainTest {
 			e.printStackTrace();
 		}
 		assertEquals(employeePayRoll, actualEmployeePayRoll);
+	}
+
+	@Test
+	public void test91_givenEmployeeName_WhenDeleted_ShouldBeInSyncWithDB() {
+		EmployeePayRollMain employeePayRollMain = new EmployeePayRollMain();
+		EmployeePayRoll employeePayRoll = null;
+		try {
+			employeePayRollMain.deleteEmployeePayRollFromPayRollTableAndList("Bezos");
+			employeePayRoll = employeePayRollMain.employeePayRollList.stream()
+					.filter(emp -> emp.getEmpName().equals("Bezos")).findFirst().orElse(null);
+		} catch (EmployeePayRollException e) {
+			e.printStackTrace();
+		}
+		assertEquals(null, employeePayRoll);
 	}
 }

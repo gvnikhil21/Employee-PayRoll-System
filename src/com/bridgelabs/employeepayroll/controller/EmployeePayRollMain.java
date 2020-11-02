@@ -3,6 +3,7 @@ package com.bridgelabs.employeepayroll.controller;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -120,6 +121,13 @@ public class EmployeePayRollMain {
 	public void addEmployeePayRollDetailsToDB(EmployeePayRoll employeePayRoll) throws EmployeePayRollException {
 		if (EmployeePayRollDBService.getInstance().addEmployeePayRollDetails(employeePayRoll))
 			employeePayRollList.add(employeePayRoll);
+	}
+
+	// delete employee pay roll from payroll table and from list
+	public void deleteEmployeePayRollFromPayRollTableAndList(String name) throws EmployeePayRollException {
+		EmployeePayRollDBService.getInstance().deleteEmployeePayRollFromPayRollTable(name);
+		employeePayRollList = employeePayRollList.stream().filter(emp -> !(emp.getEmpName().equals(name)))
+				.collect(Collectors.toList());
 	}
 
 	// retrieves employee pay roll details who started between certain date range

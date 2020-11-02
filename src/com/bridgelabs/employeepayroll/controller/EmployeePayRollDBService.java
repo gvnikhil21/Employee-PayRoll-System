@@ -133,7 +133,7 @@ public class EmployeePayRollDBService {
 		List<EmployeePayRoll> empList = new ArrayList<EmployeePayRoll>();
 		try (Connection con = PayRollDatabaseConnector.getConnection()) {
 			empStatement = con.prepareStatement(
-					"select e.employee_id, e.name,e.gender, basic_pay from employee  e join payroll p on e.employee_id=p.employee_id");
+					"select e.employee_id, e.name,e.gender, basic_pay from employee  e join payroll p on e.employee_id=p.employee_id where e.is_active=true");
 			empList = getDataInDB();
 		} catch (SQLException e) {
 			throw new EmployeePayRollException(e.getMessage());
@@ -171,7 +171,7 @@ public class EmployeePayRollDBService {
 		List<EmployeePayRoll> empList = new ArrayList<EmployeePayRoll>();
 		try (Connection con = PayRollDatabaseConnector.getConnection()) {
 			empStatement = con.prepareStatement(
-					"select * from employee e join payroll p on e.employee_id=p.employee_id where start_date between cast(? as date) and cast(? as date)");
+					"select * from employee e join payroll p on e.employee_id=p.employee_id where start_date between cast(? as date) and cast(? as date) and e.is_active=true");
 			empStatement.setString(1, start);
 			empStatement.setString(2, end);
 			empList = getDataInDB();
@@ -179,6 +179,29 @@ public class EmployeePayRollDBService {
 			throw new EmployeePayRollException(e.getMessage());
 		}
 		return empList;
+	}
+
+	// deletes employee payRoll details from payroll table
+	public void deleteEmployeePayRollFromPayRollTable(String name) throws EmployeePayRollException {
+		int employee_id = -1;
+		try (Connection con = PayRollDatabaseConnector.getConnection()) {
+			empStatement = con.prepareStatement("select employee_id from employee where name=?");
+			empStatement.setString(1, name);
+			resultSet = empStatement.executeQuery();
+			while (resultSet.next())
+				employee_id = resultSet.getInt("employee_id");
+			empStatement = con.prepareStatement("delete from payroll where employee_id=?");
+			empStatement.setInt(1, employee_id);
+			int rowsAffected = empStatement.executeUpdate();
+			if (rowsAffected > 0) {
+				empStatement = con.prepareStatement("update employee set is_active=? where name=?");
+				empStatement.setBoolean(1, false);
+				empStatement.setString(2, name);
+				empStatement.executeUpdate();
+			}
+		} catch (SQLException e) {
+			throw new EmployeePayRollException(e.getMessage());
+		}
 	}
 
 	// returns employee payroll data in database
@@ -201,7 +224,7 @@ public class EmployeePayRollDBService {
 		long avgSalary = 0l;
 		try (Connection con = PayRollDatabaseConnector.getConnection()) {
 			empStatement = con.prepareStatement(
-					"select e.gender,avg(p.basic_pay) as average_pay from employee e join payroll p on e.employee_id=p.employee_id where e.gender= ? ");
+					"select e.gender,avg(p.basic_pay) as average_pay from employee e join payroll p on e.employee_id=p.employee_id where e.gender= ? and e.is_active=true");
 			empStatement.setString(1, String.valueOf(gender));
 			resultSet = empStatement.executeQuery();
 			while (resultSet.next())
@@ -217,7 +240,7 @@ public class EmployeePayRollDBService {
 		long salary = 0l;
 		try (Connection con = PayRollDatabaseConnector.getConnection()) {
 			empStatement = con.prepareStatement(
-					"select e.gender,sum(basic_pay) as total_pay from employee e join payroll p on e.employee_id=p.employee_id where e.gender=?");
+					"select e.gender,sum(basic_pay) as total_pay from employee e join payroll p on e.employee_id=p.employee_id where e.gender=? and e.is_active=true");
 			empStatement.setString(1, String.valueOf(gender));
 			resultSet = empStatement.executeQuery();
 			while (resultSet.next())
@@ -227,12 +250,13 @@ public class EmployeePayRollDBService {
 		}
 		return salary;
 	}
-	
+
 	// returns count of employees by gender
 	public long getCountOfEmployeesByGender(char gender) throws EmployeePayRollException {
 		long count = 0l;
 		try (Connection con = PayRollDatabaseConnector.getConnection()) {
-			empStatement = con.prepareStatement("select gender,count(gender) as count from employee where gender=?");
+			empStatement = con.prepareStatement(
+					"select gender,count(gender) as count from employee where gender=? and is_active=true");
 			empStatement.setString(1, String.valueOf(gender));
 			resultSet = empStatement.executeQuery();
 			while (resultSet.next())
