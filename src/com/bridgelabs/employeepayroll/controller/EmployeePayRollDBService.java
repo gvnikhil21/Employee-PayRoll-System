@@ -227,7 +227,7 @@ public class EmployeePayRollDBService {
 		}
 		return salary;
 	}
-
+	
 	// returns count of employees by gender
 	public long getCountOfEmployeesByGender(char gender) throws EmployeePayRollException {
 		long count = 0l;

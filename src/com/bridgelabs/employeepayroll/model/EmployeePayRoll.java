@@ -26,7 +26,7 @@ public class EmployeePayRoll {
 		this(empId, empName, empSalary);
 		this.gender = gender;
 	}
-
+	
 	public EmployeePayRoll(String empId, String empName, long empSalary, char gender, LocalDate startDate,
 			String company_id) {
 		this(empId, empName, empSalary, gender);
