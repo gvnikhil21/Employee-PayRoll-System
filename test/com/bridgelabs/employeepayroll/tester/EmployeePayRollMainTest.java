@@ -214,5 +214,4 @@ public class EmployeePayRollMainTest {
 		EmployeePayRollMain.LOG.info("Duration with threads: " + Duration.between(threadStart, threadEnd));
 		assertEquals(12, employeePayRollMain.employeePayRollList.size());
 	}
-
 }

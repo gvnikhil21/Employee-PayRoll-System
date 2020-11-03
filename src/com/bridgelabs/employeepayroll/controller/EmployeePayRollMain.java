@@ -171,7 +171,6 @@ public class EmployeePayRollMain {
 		LOG.info(empList);
 	}
 
-	
 	// delete employee pay roll from payroll table and from list
 	public void deleteEmployeePayRollFromPayRollTableAndList(String name) throws EmployeePayRollException {
 		EmployeePayRollDBService.getInstance().deleteEmployeePayRollFromPayRollTable(name);
