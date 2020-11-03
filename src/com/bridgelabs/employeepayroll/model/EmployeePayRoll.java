@@ -1,6 +1,8 @@
 package com.bridgelabs.employeepayroll.model;
 
 import java.time.LocalDate;
+import java.util.Arrays;
+import java.util.Objects;
 
 public class EmployeePayRoll {
 	private String empId;
@@ -118,6 +120,51 @@ public class EmployeePayRoll {
 
 	public void setActive(boolean isActive) {
 		this.isActive = isActive;
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(empName, gender, empSalary, startDate);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		EmployeePayRoll other = (EmployeePayRoll) obj;
+		if (companyId == null) {
+			if (other.companyId != null)
+				return false;
+		} else if (!companyId.equals(other.companyId))
+			return false;
+		if (!Arrays.equals(department, other.department))
+			return false;
+		if (empId == null) {
+			if (other.empId != null)
+				return false;
+		} else if (!empId.equals(other.empId))
+			return false;
+		if (empName == null) {
+			if (other.empName != null)
+				return false;
+		} else if (!empName.equals(other.empName))
+			return false;
+		if (empSalary != other.empSalary)
+			return false;
+		if (gender != other.gender)
+			return false;
+		if (isActive != other.isActive)
+			return false;
+		if (startDate == null) {
+			if (other.startDate != null)
+				return false;
+		} else if (!startDate.equals(other.startDate))
+			return false;
+		return true;
 	}
 
 	@Override

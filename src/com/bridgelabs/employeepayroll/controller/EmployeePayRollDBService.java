@@ -26,7 +26,8 @@ public class EmployeePayRollDBService {
 	}
 
 	// adds payroll details to database
-	public boolean addEmployeePayRollDetails(EmployeePayRoll employeePayRoll) throws EmployeePayRollException {
+	public synchronized boolean addEmployeePayRollDetails(EmployeePayRoll employeePayRoll)
+			throws EmployeePayRollException {
 		Connection con = null;
 		// adding to employee table
 		try {

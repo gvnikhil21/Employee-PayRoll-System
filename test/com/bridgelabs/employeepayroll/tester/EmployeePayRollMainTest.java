@@ -8,6 +8,7 @@ import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
 
+import org.junit.Before;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
@@ -19,15 +20,21 @@ import com.bridgelabs.employeepayroll.model.EmployeePayRollException;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class EmployeePayRollMainTest {
+	private static EmployeePayRollMain employeePayRollMain;
+
+	@Before
+	public void init() {
+		employeePayRollMain = new EmployeePayRollMain();
+	}
 
 	@Test
 	public void test1_givenThreeEmployees_WhenWrittenToFile_ShouldMatchEmployeeEntries() {
 		EmployeePayRoll[] empArray = { new EmployeePayRoll("1", "Bill", 1000000),
 				new EmployeePayRoll("3", "Bezos", 2000000), new EmployeePayRoll("3", "Musk", 3000000) };
-		EmployeePayRollMain employeePayRollMain = new EmployeePayRollMain(Arrays.asList(empArray));
-		Integer entriesCount = employeePayRollMain.employeePayRollList.size();
+		EmployeePayRollMain employeePayRollMainOne = new EmployeePayRollMain(Arrays.asList(empArray));
+		Integer entriesCount = employeePayRollMainOne.employeePayRollList.size();
 		try {
-			employeePayRollMain.writeEmployeePayRollDetails(IOService.FILE_IO);
+			employeePayRollMainOne.writeEmployeePayRollDetails(IOService.FILE_IO);
 		} catch (EmployeePayRollException e) {
 			e.printStackTrace();
 		}
@@ -38,12 +45,12 @@ public class EmployeePayRollMainTest {
 	public void test2_givenThreeEmployees_WhenReadFromFile_ShouldMatchEmployeeEntries() {
 		EmployeePayRoll[] empArray = { new EmployeePayRoll("1", "Bill", 1000000),
 				new EmployeePayRoll("3", "Bezos", 2000000), new EmployeePayRoll("3", "Musk", 3000000) };
-		EmployeePayRollMain employeePayRollMain = new EmployeePayRollMain(Arrays.asList(empArray));
+		EmployeePayRollMain employeePayRollMainOne = new EmployeePayRollMain(Arrays.asList(empArray));
 		Integer entriesCount = 0;
 		try {
-			employeePayRollMain.writeEmployeePayRollDetails(IOService.FILE_IO);
-			employeePayRollMain.readEmployeePayRollDetails(IOService.FILE_IO);
-			entriesCount = employeePayRollMain.employeePayRollList.size();
+			employeePayRollMainOne.writeEmployeePayRollDetails(IOService.FILE_IO);
+			employeePayRollMainOne.readEmployeePayRollDetails(IOService.FILE_IO);
+			entriesCount = employeePayRollMainOne.employeePayRollList.size();
 		} catch (EmployeePayRollException e) {
 			e.printStackTrace();
 		}
@@ -52,7 +59,6 @@ public class EmployeePayRollMainTest {
 
 	@Test
 	public void test3_givenFourEmployeesInDB_ShouldMatchEmployeeEntries() {
-		EmployeePayRollMain employeePayRollMain = new EmployeePayRollMain();
 		Integer entriesCount = 0;
 		try {
 			employeePayRollMain.readEmployeePayRollDetails(IOService.DB_IO);
@@ -65,7 +71,6 @@ public class EmployeePayRollMainTest {
 
 	@Test
 	public void test4_updatedBasePayForTerissa_ShouldRetrurnUpdatedBasePay() {
-		EmployeePayRollMain employeePayRollMain = new EmployeePayRollMain();
 		EmployeePayRoll employee = null;
 		try {
 			employeePayRollMain.updateEmployeePayRollDetails(IOService.DB_IO, 3000000l, "Terissa");
@@ -81,7 +86,6 @@ public class EmployeePayRollMainTest {
 
 	@Test
 	public void test5_retrieveData_GivenParticularDateRange_ShouldReturnCorrectEntries() {
-		EmployeePayRollMain employeePayRollMain = new EmployeePayRollMain();
 		Integer entriesCount = 0;
 		try {
 			List<EmployeePayRoll> empList = employeePayRollMain.getEmployeePayRollDataForParticularDates("2013-01-01",
@@ -95,7 +99,6 @@ public class EmployeePayRollMainTest {
 
 	@Test
 	public void test6_calculatedAvgSalaryByGenderFromDB_ShouldSyncWithAvgSalaryByGenderFromList() {
-		EmployeePayRollMain employeePayRollMain = new EmployeePayRollMain();
 		Long femaleAvgSalary = 0l;
 		Long actualFemaleSalary = 0l;
 		Long maleAvgSalary = 0l;
@@ -120,7 +123,6 @@ public class EmployeePayRollMainTest {
 
 	@Test
 	public void test7_calculatedTotalSalaryByGenderFromDB_ShouldSyncWithTotalSalaryByGenderFromList() {
-		EmployeePayRollMain employeePayRollMain = new EmployeePayRollMain();
 		Long femaleSalary = 0l;
 		Long actualFemaleSalary = 0l;
 		Long maleSalary = 0l;
@@ -143,7 +145,6 @@ public class EmployeePayRollMainTest {
 
 	@Test
 	public void test8_calculatedTotalEMployeesyByGenderFromDB_ShouldSyncWithTotalEmployeesByGenderFromList() {
-		EmployeePayRollMain employeePayRollMain = new EmployeePayRollMain();
 		Long femaleCount = 0l;
 		Long actualFemaleCount = 0l;
 		Long maleCount = 0l;
@@ -164,7 +165,6 @@ public class EmployeePayRollMainTest {
 
 	@Test
 	public void test90_givenNewEmployee_WhenAdded_ShouldBeInSyncWithDB() {
-		EmployeePayRollMain employeePayRollMain = new EmployeePayRollMain();
 		EmployeePayRoll employeePayRoll = null;
 		String DepartmentId[] = { "1", "3" };
 		EmployeePayRoll actualEmployeePayRoll = new EmployeePayRoll("Bezos", 5000000, 'M', LocalDate.now(), "1",
@@ -181,7 +181,6 @@ public class EmployeePayRollMainTest {
 
 	@Test
 	public void test91_givenEmployeeName_WhenDeleted_ShouldBeInSyncWithDB() {
-		EmployeePayRollMain employeePayRollMain = new EmployeePayRollMain();
 		EmployeePayRoll employeePayRoll = null;
 		try {
 			employeePayRollMain.deleteEmployeePayRollFromPayRollTableAndList("Bezos");
@@ -200,7 +199,6 @@ public class EmployeePayRollMainTest {
 				new EmployeePayRoll("Christine", 6000000l, 'F', LocalDate.now(), "4", "2".split(",")),
 				new EmployeePayRoll("Henry", 7000000l, 'M', LocalDate.of(2017, 06, 15), "2", "4".split(",")),
 				new EmployeePayRoll("Helen", 5000000l, 'F', LocalDate.of(2019, 06, 15), "4", "3".split(",")) };
-		EmployeePayRollMain employeePayRollMain = new EmployeePayRollMain();
 		try {
 			employeePayRollMain.readEmployeePayRollDetails(IOService.DB_IO);
 		} catch (EmployeePayRollException e) {
@@ -210,6 +208,10 @@ public class EmployeePayRollMainTest {
 		employeePayRollMain.addEmployeePayRollDetailsToDBWithOutThread(Arrays.asList(emp));
 		Instant end = Instant.now();
 		EmployeePayRollMain.LOG.info("Duration without thread: " + Duration.between(start, end));
-		assertEquals(8, employeePayRollMain.employeePayRollList.size());
+		Instant threadStart = Instant.now();
+		employeePayRollMain.addEmployeePayRollDetailsToDBWithThreads(Arrays.asList(emp));
+		Instant threadEnd = Instant.now();
+		EmployeePayRollMain.LOG.info("Duration with threads: " + Duration.between(threadStart, threadEnd));
+		assertEquals(12, employeePayRollMain.employeePayRollList.size());
 	}
 }

@@ -2,7 +2,9 @@ package com.bridgelabs.employeepayroll.controller;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
@@ -136,6 +138,36 @@ public class EmployeePayRollMain {
 				e.printStackTrace();
 			}
 		});
+		LOG.info(empList);
+	}
+
+	// adds multiple employee payroll objects to database and employee pay roll list
+	public void addEmployeePayRollDetailsToDBWithThreads(List<EmployeePayRoll> empList) {
+		Map<Integer, Boolean> employeeAdditionStatus = new HashMap<>();
+		empList.forEach(emp -> {
+			Runnable task = () -> {
+				employeeAdditionStatus.put(emp.hashCode(), false);
+				LOG.info("Employee being added: " + Thread.currentThread().getName());
+				try {
+					if (EmployeePayRollDBService.getInstance().addEmployeePayRollDetails(emp)) {
+						employeePayRollList.add(emp);
+						employeeAdditionStatus.put(emp.hashCode(), true);
+						LOG.info("Employee added: " + Thread.currentThread().getName());
+					}
+				} catch (EmployeePayRollException e) {
+					e.printStackTrace();
+				}
+			};
+			Thread thread = new Thread(task, emp.getEmpName());
+			thread.start();
+		});
+		while (employeeAdditionStatus.containsValue(false)) {
+			try {
+				Thread.sleep(10);
+			} catch (InterruptedException e) {
+				LOG.error(e.getMessage());
+			}
+		}
 		LOG.info(empList);
 	}
 
