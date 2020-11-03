@@ -38,7 +38,7 @@ public class EmployeePayRollDBService {
 			empStatement.setString(1, employeePayRoll.getEmpName());
 			empStatement.setString(2, String.valueOf(employeePayRoll.getGender()));
 			empStatement.setDate(3, Date.valueOf(employeePayRoll.getStartDate()));
-			empStatement.setString(4, employeePayRoll.getCompany_id());
+			empStatement.setString(4, employeePayRoll.getCompanyId());
 			int rowAffected = empStatement.executeUpdate();
 			if (rowAffected == 0)
 				return false;

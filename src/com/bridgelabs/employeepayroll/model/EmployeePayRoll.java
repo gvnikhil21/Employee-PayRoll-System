@@ -8,7 +8,7 @@ public class EmployeePayRoll {
 	private long empSalary;
 	private char gender;
 	private LocalDate startDate;
-	private String company_id;
+	private String companyId;
 	private String department[];
 	private boolean isActive = true;
 
@@ -29,29 +29,29 @@ public class EmployeePayRoll {
 	}
 
 	public EmployeePayRoll(String empId, String empName, long empSalary, char gender, LocalDate startDate,
-			String company_id) {
+			String companyId) {
 		this(empId, empName, empSalary, gender);
 		this.startDate = startDate;
-		this.company_id = company_id;
+		this.companyId = companyId;
 	}
 
 	public EmployeePayRoll(String empId, String empName, long empSalary, char gender, LocalDate startDate,
-			String company_id, String[] department) {
-		this(empId, empName, empSalary, gender, startDate, company_id);
+			String companyId, String[] department) {
+		this(empId, empName, empSalary, gender, startDate, companyId);
 		this.department = department;
 	}
 
-	public EmployeePayRoll(String empName, long empSalary, char gender, LocalDate startDate, String company_id) {
+	public EmployeePayRoll(String empName, long empSalary, char gender, LocalDate startDate, String companyId) {
 		this.empName = empName;
 		this.empSalary = empSalary;
 		this.gender = gender;
 		this.startDate = startDate;
-		this.company_id = company_id;
+		this.companyId = companyId;
 	}
 
-	public EmployeePayRoll(String empName, long empSalary, char gender, LocalDate startDate, String company_id,
+	public EmployeePayRoll(String empName, long empSalary, char gender, LocalDate startDate, String companyId,
 			String[] department) {
-		this(empName, empSalary, gender, startDate, company_id);
+		this(empName, empSalary, gender, startDate, companyId);
 		this.department = department;
 	}
 
@@ -96,12 +96,12 @@ public class EmployeePayRoll {
 		this.startDate = startDate;
 	}
 
-	public String getCompany_id() {
-		return company_id;
+	public String getCompanyId() {
+		return companyId;
 	}
 
-	public void setCompany_id(String company_id) {
-		this.company_id = company_id;
+	public void setCompanyId(String companyId) {
+		this.companyId = companyId;
 	}
 
 	public String[] getDepartment() {

@@ -123,6 +123,22 @@ public class EmployeePayRollMain {
 			employeePayRollList.add(employeePayRoll);
 	}
 
+	// adds multiple employee payroll objects to database and employee pay roll list
+	public void addEmployeePayRollDetailsToDBWithOutThread(List<EmployeePayRoll> empList) {
+		empList.forEach(emp -> {
+			LOG.info("Employee being added: " + emp.getEmpName());
+			try {
+				if (EmployeePayRollDBService.getInstance().addEmployeePayRollDetails(emp)) {
+					employeePayRollList.add(emp);
+					LOG.info("Employee added: " + emp.getEmpName());
+				}
+			} catch (EmployeePayRollException e) {
+				e.printStackTrace();
+			}
+		});
+		LOG.info(empList);
+	}
+
 	// delete employee pay roll from payroll table and from list
 	public void deleteEmployeePayRollFromPayRollTableAndList(String name) throws EmployeePayRollException {
 		EmployeePayRollDBService.getInstance().deleteEmployeePayRollFromPayRollTable(name);

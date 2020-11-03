@@ -2,6 +2,8 @@ package com.bridgelabs.employeepayroll.tester;
 
 import static org.junit.Assert.assertEquals;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
@@ -189,5 +191,25 @@ public class EmployeePayRollMainTest {
 			e.printStackTrace();
 		}
 		assertEquals(null, employeePayRoll);
+	}
+
+	@Test
+	public void test92_givenMultipleEmployess_WhenAdded_ShouldBeInSyncWithDB() {
+		EmployeePayRoll emp[] = {
+				new EmployeePayRoll("Chris", 5000000l, 'M', LocalDate.of(2018, 06, 15), "2", "1,4".split(",")),
+				new EmployeePayRoll("Christine", 6000000l, 'F', LocalDate.now(), "4", "2".split(",")),
+				new EmployeePayRoll("Henry", 7000000l, 'M', LocalDate.of(2017, 06, 15), "2", "4".split(",")),
+				new EmployeePayRoll("Helen", 5000000l, 'F', LocalDate.of(2019, 06, 15), "4", "3".split(",")) };
+		EmployeePayRollMain employeePayRollMain = new EmployeePayRollMain();
+		try {
+			employeePayRollMain.readEmployeePayRollDetails(IOService.DB_IO);
+		} catch (EmployeePayRollException e) {
+			e.printStackTrace();
+		}
+		Instant start = Instant.now();
+		employeePayRollMain.addEmployeePayRollDetailsToDBWithOutThread(Arrays.asList(emp));
+		Instant end = Instant.now();
+		EmployeePayRollMain.LOG.info("Duration without thread: " + Duration.between(start, end));
+		assertEquals(8, employeePayRollMain.employeePayRollList.size());
 	}
 }
