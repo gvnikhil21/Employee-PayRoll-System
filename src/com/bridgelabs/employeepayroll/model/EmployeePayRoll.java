@@ -7,8 +7,8 @@ import java.util.Objects;
 public class EmployeePayRoll {
 	private String empId;
 	private String empName;
-	private long empSalary;
-	private char gender;
+	private Long empSalary;
+	private Character gender;
 	private LocalDate startDate;
 	private String companyId;
 	private String department[];
@@ -19,10 +19,14 @@ public class EmployeePayRoll {
 	}
 
 	// parameterized constructor
-	public EmployeePayRoll(String empId, String empName, long empSalary) {
-		this.empId = empId;
+	public EmployeePayRoll(String empName, long empSalary) {
 		this.empName = empName;
 		this.empSalary = empSalary;
+	}
+
+	public EmployeePayRoll(String empId, String empName, long empSalary) {
+		this(empName, empSalary);
+		this.empId = empId;
 	}
 
 	public EmployeePayRoll(String empId, String empName, long empSalary, char gender) {
@@ -74,19 +78,19 @@ public class EmployeePayRoll {
 		this.empName = empName;
 	}
 
-	public long getEmpSalary() {
+	public Long getEmpSalary() {
 		return empSalary;
 	}
 
-	public void setEmpSalary(long empSalary) {
+	public void setEmpSalary(Long empSalary) {
 		this.empSalary = empSalary;
 	}
 
-	public char getGender() {
+	public Character getGender() {
 		return gender;
 	}
 
-	public void setGender(char gender) {
+	public void setGender(Character gender) {
 		this.gender = gender;
 	}
 

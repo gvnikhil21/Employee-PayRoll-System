@@ -135,26 +135,77 @@ public class EmployeePayRollDBService {
 	}
 
 	// updates details in database
-	public void updateBasicPayDetailsInDatabase(Long basic_pay, String name) throws EmployeePayRollException {
-		try (Connection con = PayRollDatabaseConnector.getConnection()) {
+	public synchronized boolean updateBasicPayDetailsInDatabase(Long basic_pay, String name)
+			throws EmployeePayRollException {
+		int empId = -1;
+		Connection con = null;
+		con = PayRollDatabaseConnector.getConnection();
+		try {
+			con.setAutoCommit(false);
 			String query = "update employee e join payroll p on e.employee_id= p.employee_id set basic_pay=? where e.name=?";
 			empStatement = con.prepareStatement(query);
 			empStatement.setLong(1, basic_pay);
 			empStatement.setString(2, name);
 			int status = empStatement.executeUpdate();
-			if (status > 0) {
-				query = "update payroll set deductions=0.2*basic_pay,taxable_pay=basic_pay-deductions,tax=0.1*taxable_pay,net_pay=taxable_pay-tax";
-				empStatement = con.prepareStatement(query);
-				status = empStatement.executeUpdate();
-				if (status > 0)
-					EmployeePayRollMain.LOG.info("Details updated successfully to database");
-				else
-					EmployeePayRollMain.LOG.info("Details not updated");
-			} else
-				EmployeePayRollMain.LOG.info("Details not updated");
+			if (status == 0)
+				return false;
+		} catch (SQLException e) {
+			e.printStackTrace();
+			try {
+				con.rollback();
+				return false;
+			} catch (SQLException e1) {
+				throw new EmployeePayRollException(e.getMessage());
+			}
+		}
+
+		try {
+			String query = "select employee_id from employee where name= ?";
+			empStatement = con.prepareStatement(query);
+			empStatement.setString(1, name);
+			resultSet = empStatement.executeQuery();
+			if (resultSet.next() == false)
+				return false;
+			if (resultSet.next())
+				empId = resultSet.getInt("employee_id");
+		} catch (SQLException e) {
+			e.printStackTrace();
+			try {
+				con.rollback();
+				return false;
+			} catch (SQLException e1) {
+				throw new EmployeePayRollException(e.getMessage());
+			}
+		}
+
+		try {
+			String query = "update payroll set deductions=0.2*basic_pay,taxable_pay=basic_pay-deductions,tax=0.1*taxable_pay,net_pay=taxable_pay-tax where employee_id=?";
+			empStatement = con.prepareStatement(query);
+			empStatement.setInt(1, empId);
+			int status = empStatement.executeUpdate();
+			if (status == 0)
+				return false;
+		} catch (SQLException e) {
+			e.printStackTrace();
+			try {
+				con.rollback();
+				return false;
+			} catch (SQLException e1) {
+				throw new EmployeePayRollException(e.getMessage());
+			}
+		}
+		try {
+			con.commit();
 		} catch (SQLException e) {
 			throw new EmployeePayRollException(e.getMessage());
+		} finally {
+			try {
+				con.close();
+			} catch (SQLException e) {
+				throw new EmployeePayRollException(e.getMessage());
+			}
 		}
+		return true;
 	}
 
 	// retrieve all employee pay-roll details who started between certain date range

@@ -111,6 +111,54 @@ public class EmployeePayRollMain {
 		EmployeePayRollDBService.getInstance().updateBasicPayDetailsInDatabase(basic_pay, name);
 	}
 
+	// update multiple employee payroll-details in database without threads
+	public void updateMultipleEmployeePayRollDetailsWithoutThread(List<EmployeePayRoll> empList) {
+		empList.forEach(emp -> {
+			LOG.info("Employee being updated: " + emp.getEmpName());
+			try {
+				if (EmployeePayRollDBService.getInstance().updateBasicPayDetailsInDatabase(emp.getEmpSalary(),
+						emp.getEmpName()))
+					LOG.info("Employee updated: " + emp.getEmpName());
+				else
+					LOG.info("Employee not updated: " + emp.getEmpName());
+			} catch (EmployeePayRollException e) {
+				e.printStackTrace();
+			}
+		});
+		LOG.info(empList);
+	}
+
+	// update multiple employee payroll-details in database with threads
+	public void updateMultipleEmployeePayRollDetailsWithThreads(List<EmployeePayRoll> empList) {
+		Map<Integer, Boolean> mapUpdateStatus = new HashMap<>();
+		empList.forEach(emp -> {
+			Runnable task = () -> {
+				mapUpdateStatus.put(emp.hashCode(), false);
+				LOG.info("Employee being updated: " + Thread.currentThread().getName());
+				try {
+					if (EmployeePayRollDBService.getInstance().updateBasicPayDetailsInDatabase(emp.getEmpSalary(),
+							emp.getEmpName())) {
+						mapUpdateStatus.put(emp.hashCode(), true);
+						LOG.info("Employee updated: " + Thread.currentThread().getName());
+					} else
+						LOG.info("Employee not updated: " + Thread.currentThread().getName());
+				} catch (EmployeePayRollException e) {
+					e.printStackTrace();
+				}
+			};
+			Thread thread = new Thread(task, emp.getEmpName());
+			thread.start();
+		});
+		while (mapUpdateStatus.containsValue(false)) {
+			try {
+				Thread.sleep(10);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+		LOG.info(empList);
+	}
+
 	// writes employee payroll details to console or file or database
 	public void writeEmployeePayRollDetails(IOService ioService) throws EmployeePayRollException {
 		if (ioService.equals(IOService.CONSOLE_IO))
@@ -135,7 +183,7 @@ public class EmployeePayRollMain {
 					LOG.info("Employee added: " + emp.getEmpName());
 				}
 			} catch (EmployeePayRollException e) {
-				e.printStackTrace();
+				LOG.error(e.getMessage());
 			}
 		});
 		LOG.info(empList);
