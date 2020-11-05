@@ -1,18 +1,6 @@
 {
   "employees": [
     {
-      "empId": "1",
-      "empName": "Goyal",
-      "empSalary": 6000000,
-      "gender": "M",
-      "startDate": {
-        "year": 2020,
-        "month": 11,
-        "day": 5
-      },
-      "isActive": true
-    },
-    {
       "empId": "2",
       "empName": "Piyush",
       "empSalary": 6000000,

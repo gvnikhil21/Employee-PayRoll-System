@@ -183,7 +183,7 @@ public class EmployeePayRollMainTest {
 	public void test91_givenEmployeeName_WhenDeleted_ShouldBeInSyncWithDB() {
 		EmployeePayRoll employeePayRoll = null;
 		try {
-			employeePayRollMain.deleteEmployeePayRollFromPayRollTableAndList("Bezos");
+			employeePayRollMain.deleteEmployeePayRoll(IOService.DB_IO, "Bezos");
 			employeePayRoll = employeePayRollMain.employeePayRollList.stream()
 					.filter(emp -> emp.getEmpName().equals("Bezos")).findFirst().orElse(null);
 		} catch (EmployeePayRollException e) {

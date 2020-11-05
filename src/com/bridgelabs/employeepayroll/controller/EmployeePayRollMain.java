@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -238,10 +237,14 @@ public class EmployeePayRollMain {
 	}
 
 	// delete employee pay roll from payroll table and from list
-	public void deleteEmployeePayRollFromPayRollTableAndList(String name) throws EmployeePayRollException {
-		EmployeePayRollDBService.getInstance().deleteEmployeePayRollFromPayRollTable(name);
-		employeePayRollList = employeePayRollList.stream().filter(emp -> !(emp.getEmpName().equals(name)))
-				.collect(Collectors.toList());
+	public void deleteEmployeePayRoll(IOService ioService, String name) throws EmployeePayRollException {
+		EmployeePayRoll employeePayRoll = getEmployeePayRoll(name);
+		if (ioService.equals(IOService.DB_IO)) {
+			EmployeePayRollDBService.getInstance().deleteEmployeePayRollFromPayRollTable(name);
+			employeePayRollList.remove(employeePayRoll);
+		}
+		if (ioService.equals(IOService.REST_IO))
+			employeePayRollList.remove(employeePayRoll);
 	}
 
 	// retrieves employee pay roll details who started between certain date range

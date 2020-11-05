@@ -82,6 +82,26 @@ public class EmployeePayRollRESTAPITest {
 		assertEquals(5, recordsCount);
 	}
 
+	@Test
+	public void test4_givenEmployee_WhenDeleted_ShouldMatch() {
+		EmployeePayRoll[] empPayRoll = getEmployeeList();
+		EmployeePayRollMain employeePayRollMain = new EmployeePayRollMain(Arrays.asList(empPayRoll));
+		EmployeePayRoll employeePayRoll = employeePayRollMain.getEmployeePayRoll("Goyal");
+		RequestSpecification request = RestAssured.given();
+		request.header("Content-Type", "application/json");
+		Response response = request.delete("/employees/" + employeePayRoll.getEmpId());
+		int statusCode = response.getStatusCode();
+		assertEquals(200, statusCode);
+		long recordsCount = 0l;
+		try {
+			employeePayRollMain.deleteEmployeePayRoll(IOService.REST_IO, "Goyal");
+			recordsCount = employeePayRollMain.countEntries(IOService.REST_IO);
+		} catch (EmployeePayRollException e) {
+			e.printStackTrace();
+		}
+		assertEquals(4, recordsCount);
+	}
+
 	// adds employee to json-server
 	private Response addEmployeeToJSONServer(EmployeePayRoll empPayRoll) {
 		String Json = new Gson().toJson(empPayRoll);
