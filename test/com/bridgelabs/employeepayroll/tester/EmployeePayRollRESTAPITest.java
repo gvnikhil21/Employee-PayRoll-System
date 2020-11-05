@@ -28,10 +28,10 @@ public class EmployeePayRollRESTAPITest {
 	public void givenEmployee_WhenAdded_ShouldMatch201Response() {
 		EmployeePayRoll[] empArray = getEmployeeList();
 		EmployeePayRollMain employeePayRollMain = new EmployeePayRollMain(Arrays.asList(empArray));
-		EmployeePayRoll[] empPayRoll = { new EmployeePayRoll("Piyush", 6000000l, 'M', LocalDate.now()),
-				new EmployeePayRoll("Nirmala", 7000000l, 'F', LocalDate.now()),
-				new EmployeePayRoll("Sonia", 6000000l, 'F', LocalDate.now()),
-				new EmployeePayRoll("Kalam", 9000000l, 'M', LocalDate.now()) };
+		EmployeePayRoll[] empPayRoll = { new EmployeePayRoll("2", "Piyush", 6000000l, 'M', LocalDate.now()),
+				new EmployeePayRoll("3", "Nirmala", 7000000l, 'F', LocalDate.now()),
+				new EmployeePayRoll("4", "Sonia", 6000000l, 'F', LocalDate.now()),
+				new EmployeePayRoll("5", "Kalam", 9000000l, 'M', LocalDate.now()) };
 		Arrays.asList(empPayRoll).stream().forEach(employeePayRoll -> {
 			Response response = addEmployeeToJSONServer(employeePayRoll);
 			int statusCode = response.getStatusCode();
