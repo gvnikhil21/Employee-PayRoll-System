@@ -51,11 +51,14 @@ public class EmployeePayRoll {
 		this.department = department;
 	}
 
-	public EmployeePayRoll(String empName, long empSalary, char gender, LocalDate startDate, String companyId) {
-		this.empName = empName;
-		this.empSalary = empSalary;
+	public EmployeePayRoll(String empName, long empSalary, char gender, LocalDate startDate) {
+		this(empName, empSalary);
 		this.gender = gender;
 		this.startDate = startDate;
+	}
+
+	public EmployeePayRoll(String empName, long empSalary, char gender, LocalDate startDate, String companyId) {
+		this(empName, empSalary, gender, startDate);
 		this.companyId = companyId;
 	}
 

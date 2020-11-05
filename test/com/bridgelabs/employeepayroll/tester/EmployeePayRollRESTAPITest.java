@@ -28,17 +28,23 @@ public class EmployeePayRollRESTAPITest {
 	public void givenEmployee_WhenAdded_ShouldMatch201Response() {
 		EmployeePayRoll[] empArray = getEmployeeList();
 		EmployeePayRollMain employeePayRollMain = new EmployeePayRollMain(Arrays.asList(empArray));
-		EmployeePayRoll empPayRoll = new EmployeePayRoll("1", "Goyal", 5000000l, 'M', LocalDate.now());
-		Response response = addEmployeeToJSONServer(empPayRoll);
-		int statusCode = response.getStatusCode();
-		assertEquals(201, statusCode);
-		EmployeePayRoll employeePayRoll = new Gson().fromJson(response.asString(), EmployeePayRoll.class);
-		try {
-			employeePayRollMain.addEmployeePayRollDetails(employeePayRoll, IOService.REST_IO);
-		} catch (EmployeePayRollException e) {
-			e.printStackTrace();
-		}
-		assertEquals(1, employeePayRollMain.employeePayRollList.size());
+		EmployeePayRoll[] empPayRoll = { new EmployeePayRoll("Piyush", 6000000l, 'M', LocalDate.now()),
+				new EmployeePayRoll("Nirmala", 7000000l, 'F', LocalDate.now()),
+				new EmployeePayRoll("Sonia", 6000000l, 'F', LocalDate.now()),
+				new EmployeePayRoll("Kalam", 9000000l, 'M', LocalDate.now()) };
+		Arrays.asList(empPayRoll).stream().forEach(employeePayRoll -> {
+			Response response = addEmployeeToJSONServer(employeePayRoll);
+			int statusCode = response.getStatusCode();
+			assertEquals(201, statusCode);
+			employeePayRoll = new Gson().fromJson(response.asString(), EmployeePayRoll.class);
+			try {
+				employeePayRollMain.addEmployeePayRollDetails(employeePayRoll, IOService.REST_IO);
+			} catch (EmployeePayRollException e) {
+				e.printStackTrace();
+			}
+		});
+
+		assertEquals(5, employeePayRollMain.employeePayRollList.size());
 	}
 
 	private Response addEmployeeToJSONServer(EmployeePayRoll empPayRoll) {
