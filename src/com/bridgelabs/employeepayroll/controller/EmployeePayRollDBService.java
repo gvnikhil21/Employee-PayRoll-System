@@ -10,8 +10,8 @@ import com.bridgelabs.employeepayroll.model.EmployeePayRoll;
 import com.bridgelabs.employeepayroll.model.EmployeePayRollException;
 
 public class EmployeePayRollDBService {
-	private static PreparedStatement empStatement;
-	private static ResultSet resultSet;
+	private PreparedStatement empStatement;
+	private ResultSet resultSet;
 	private static EmployeePayRollDBService employeePayRollDBService;
 
 	// no-arg constructor made private to ensure singleton property
@@ -61,17 +61,17 @@ public class EmployeePayRollDBService {
 		try {
 			empStatement = con.prepareStatement(
 					"insert into payroll (employee_id,basic_pay,deductions,taxable_pay,tax,net_pay) values (?,?,?,?,?,?)");
-			BigDecimal basic_pay = BigDecimal.valueOf(employeePayRoll.getEmpSalary());
-			BigDecimal deductions = basic_pay.multiply(BigDecimal.valueOf(0.2));
-			BigDecimal taxable_pay = basic_pay.subtract(deductions);
-			BigDecimal tax = taxable_pay.multiply(BigDecimal.valueOf(0.1));
-			BigDecimal net_pay = taxable_pay.subtract(tax);
+			BigDecimal basicPay = BigDecimal.valueOf(employeePayRoll.getEmpSalary());
+			BigDecimal deductions = basicPay.multiply(BigDecimal.valueOf(0.2));
+			BigDecimal taxablePay = basicPay.subtract(deductions);
+			BigDecimal tax = taxablePay.multiply(BigDecimal.valueOf(0.1));
+			BigDecimal netPay = taxablePay.subtract(tax);
 			empStatement.setInt(1, Integer.valueOf(employeePayRoll.getEmpId()));
-			empStatement.setBigDecimal(2, basic_pay);
+			empStatement.setBigDecimal(2, basicPay);
 			empStatement.setBigDecimal(3, deductions);
-			empStatement.setBigDecimal(4, taxable_pay);
+			empStatement.setBigDecimal(4, taxablePay);
 			empStatement.setBigDecimal(5, tax);
-			empStatement.setBigDecimal(6, net_pay);
+			empStatement.setBigDecimal(6, netPay);
 			int rowAffected = empStatement.executeUpdate();
 			if (rowAffected == 0)
 				return false;
@@ -110,19 +110,18 @@ public class EmployeePayRollDBService {
 		} catch (SQLException e) {
 			throw new EmployeePayRollException(e.getMessage());
 		} finally {
-			if (con != null)
-				try {
-					con.close();
-				} catch (SQLException e) {
-					throw new EmployeePayRollException(e.getMessage());
-				}
+			try {
+				con.close();
+			} catch (SQLException e) {
+				throw new EmployeePayRollException(e.getMessage());
+			}
 		}
 		return true;
 	}
 
 	// reads employee payRoll details from database
 	public List<EmployeePayRoll> readEmployeePayRollDetailsFromDatabase() throws EmployeePayRollException {
-		List<EmployeePayRoll> empList = new ArrayList<EmployeePayRoll>();
+		List<EmployeePayRoll> empList = new ArrayList<>();
 		try (Connection con = PayRollDatabaseConnector.getConnection()) {
 			empStatement = con.prepareStatement(
 					"select e.employee_id, e.name,e.gender, basic_pay from employee  e join payroll p on e.employee_id=p.employee_id where e.is_active=true");
@@ -135,7 +134,7 @@ public class EmployeePayRollDBService {
 	}
 
 	// updates details in database
-	public synchronized boolean updateBasicPayDetailsInDatabase(Long basic_pay, String name)
+	public synchronized boolean updateBasicPayDetailsInDatabase(Long basicPay, String name)
 			throws EmployeePayRollException {
 		int empId = -1;
 		Connection con = null;
@@ -144,7 +143,7 @@ public class EmployeePayRollDBService {
 			con.setAutoCommit(false);
 			String query = "update employee e join payroll p on e.employee_id= p.employee_id set basic_pay=? where e.name=?";
 			empStatement = con.prepareStatement(query);
-			empStatement.setLong(1, basic_pay);
+			empStatement.setLong(1, basicPay);
 			empStatement.setString(2, name);
 			int status = empStatement.executeUpdate();
 			if (status == 0)
@@ -164,7 +163,7 @@ public class EmployeePayRollDBService {
 			empStatement = con.prepareStatement(query);
 			empStatement.setString(1, name);
 			resultSet = empStatement.executeQuery();
-			if (resultSet.next() == false)
+			if (!resultSet.next())
 				return false;
 			if (resultSet.next())
 				empId = resultSet.getInt("employee_id");
@@ -211,7 +210,7 @@ public class EmployeePayRollDBService {
 	// retrieve all employee pay-roll details who started between certain date range
 	public List<EmployeePayRoll> retrieveEmployeePayRollDetails(String start, String end)
 			throws EmployeePayRollException {
-		List<EmployeePayRoll> empList = new ArrayList<EmployeePayRoll>();
+		List<EmployeePayRoll> empList = new ArrayList<>();
 		try (Connection con = PayRollDatabaseConnector.getConnection()) {
 			empStatement = con.prepareStatement(
 					"select * from employee e join payroll p on e.employee_id=p.employee_id where start_date between cast(? as date) and cast(? as date) and e.is_active=true");
@@ -226,15 +225,15 @@ public class EmployeePayRollDBService {
 
 	// deletes employee payRoll details from payroll table
 	public void deleteEmployeePayRollFromPayRollTable(String name) throws EmployeePayRollException {
-		int employee_id = -1;
+		int employeeId = -1;
 		try (Connection con = PayRollDatabaseConnector.getConnection()) {
 			empStatement = con.prepareStatement("select employee_id from employee where name=?");
 			empStatement.setString(1, name);
 			resultSet = empStatement.executeQuery();
 			while (resultSet.next())
-				employee_id = resultSet.getInt("employee_id");
+				employeeId = resultSet.getInt("employee_id");
 			empStatement = con.prepareStatement("delete from payroll where employee_id=?");
-			empStatement.setInt(1, employee_id);
+			empStatement.setInt(1, employeeId);
 			int rowsAffected = empStatement.executeUpdate();
 			if (rowsAffected > 0) {
 				empStatement = con.prepareStatement("update employee set is_active=? where name=?");
@@ -249,7 +248,7 @@ public class EmployeePayRollDBService {
 
 	// returns employee payroll data in database
 	private List<EmployeePayRoll> getDataInDB() throws EmployeePayRollException {
-		List<EmployeePayRoll> empList = new ArrayList<EmployeePayRoll>();
+		List<EmployeePayRoll> empList = new ArrayList<>();
 		try {
 			resultSet = empStatement.executeQuery();
 			while (resultSet.next()) {

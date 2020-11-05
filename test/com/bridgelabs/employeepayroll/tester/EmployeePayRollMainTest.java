@@ -23,7 +23,7 @@ public class EmployeePayRollMainTest {
 	private static EmployeePayRollMain employeePayRollMain;
 
 	@Before
-	public void init() {
+	public static void init() {
 		employeePayRollMain = new EmployeePayRollMain();
 	}
 
@@ -166,7 +166,7 @@ public class EmployeePayRollMainTest {
 	@Test
 	public void test90_givenNewEmployee_WhenAdded_ShouldBeInSyncWithDB() {
 		EmployeePayRoll employeePayRoll = null;
-		String DepartmentId[] = { "1", "3" };
+		String[] DepartmentId = { "1", "3" };
 		EmployeePayRoll actualEmployeePayRoll = new EmployeePayRoll("Bezos", 5000000, 'M', LocalDate.now(), "1",
 				DepartmentId);
 		try {
@@ -194,7 +194,7 @@ public class EmployeePayRollMainTest {
 
 	@Test
 	public void test92_givenMultipleEmployees_WhenAdded_ShouldBeInSyncWithDB() {
-		EmployeePayRoll emp[] = {
+		EmployeePayRoll[] emp = {
 				new EmployeePayRoll("Chris", 5000000l, 'M', LocalDate.of(2018, 06, 15), "2", "1,4".split(",")),
 				new EmployeePayRoll("Christine", 6000000l, 'F', LocalDate.now(), "4", "2".split(",")),
 				new EmployeePayRoll("Henry", 7000000l, 'M', LocalDate.of(2017, 06, 15), "2", "4".split(",")),
@@ -207,17 +207,17 @@ public class EmployeePayRollMainTest {
 		Instant start = Instant.now();
 		employeePayRollMain.addEmployeePayRollDetailsToDBWithOutThread(Arrays.asList(emp));
 		Instant end = Instant.now();
-		EmployeePayRollMain.LOG.info("Duration without thread: " + Duration.between(start, end));
+		EmployeePayRollMain.LOG.info("Duration without thread: ", Duration.between(start, end));
 		Instant threadStart = Instant.now();
 		employeePayRollMain.addEmployeePayRollDetailsToDBWithThreads(Arrays.asList(emp));
 		Instant threadEnd = Instant.now();
-		EmployeePayRollMain.LOG.info("Duration with threads: " + Duration.between(threadStart, threadEnd));
+		EmployeePayRollMain.LOG.info("Duration with threads: ", Duration.between(threadStart, threadEnd));
 		assertEquals(12, employeePayRollMain.employeePayRollList.size());
 	}
 
 	@Test
 	public void test93_givenMultipleEmployeesSalary_WhenUpdated_ShouldBeInSyncWithDB() {
-		EmployeePayRoll employeeArray[] = { new EmployeePayRoll("Chris", 6000000l),
+		EmployeePayRoll[] employeeArray = { new EmployeePayRoll("Chris", 6000000l),
 				new EmployeePayRoll("Christine", 7000000l), new EmployeePayRoll("Henry", 8000000l),
 				new EmployeePayRoll("Helen", 9000000l) };
 		try {
@@ -228,11 +228,11 @@ public class EmployeePayRollMainTest {
 		Instant start = Instant.now();
 		employeePayRollMain.updateMultipleEmployeePayRollDetailsWithoutThread(Arrays.asList(employeeArray));
 		Instant end = Instant.now();
-		EmployeePayRollMain.LOG.info("Duration without thread: " + Duration.between(start, end));
+		EmployeePayRollMain.LOG.info("Duration without thread: ", Duration.between(start, end));
 		Instant threadStart = Instant.now();
 		employeePayRollMain.updateMultipleEmployeePayRollDetailsWithThreads(Arrays.asList(employeeArray));
 		Instant threadEnd = Instant.now();
-		EmployeePayRollMain.LOG.info("Duration with thread: " + Duration.between(threadStart, threadEnd));
+		EmployeePayRollMain.LOG.info("Duration with thread: ", Duration.between(threadStart, threadEnd));
 		try {
 			employeePayRollMain.readEmployeePayRollDetails(IOService.DB_IO);
 		} catch (EmployeePayRollException e) {

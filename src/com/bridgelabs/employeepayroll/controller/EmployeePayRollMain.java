@@ -13,20 +13,20 @@ import org.apache.logging.log4j.Logger;
 import com.bridgelabs.employeepayroll.model.*;
 
 public class EmployeePayRollMain {
+	public static final Logger LOG = LogManager.getLogger(EmployeePayRollMain.class);
+	public static final BufferedReader CONSOLE_READER = new BufferedReader(new InputStreamReader(System.in));
+
 	public List<EmployeePayRoll> employeePayRollList;
-	public static Logger LOG = LogManager.getLogger(EmployeePayRollMain.class);
-	public static BufferedReader consoleReader;
 
 	// no-arg constructor initializes employeePayRollList, consoleReader
 	public EmployeePayRollMain() {
-		employeePayRollList = new ArrayList<EmployeePayRoll>();
-		consoleReader = new BufferedReader(new InputStreamReader(System.in));
+		employeePayRollList = new ArrayList<>();
 	}
 
 	// parameterized constructor initializes consoleReader
 	public EmployeePayRollMain(List<EmployeePayRoll> employeePayRollList) {
+		this();
 		this.employeePayRollList = employeePayRollList;
-		consoleReader = new BufferedReader(new InputStreamReader(System.in));
 	}
 
 	// enum for different input output services
@@ -43,7 +43,7 @@ public class EmployeePayRollMain {
 				LOG.info(
 						"Chooose one option:\n1. Read and add employee payRoll details from console\n2. Write employee payRoll details to console\n3. Wrie employee payRoll details to a file\n4. Print details from file\n5. Find no. of entries in file\n6. Read employee payRoll details from the file\n7. Exit\n");
 				try {
-					choice = Integer.parseInt(consoleReader.readLine());
+					choice = Integer.parseInt(CONSOLE_READER.readLine());
 				} catch (NumberFormatException | IOException e) {
 					throw new EmployeePayRollException("Choice should be a number!");
 				}
@@ -86,11 +86,11 @@ public class EmployeePayRollMain {
 		try {
 			if (ioService.equals(IOService.CONSOLE_IO)) {
 				LOG.info("Enter the employee Id: \n");
-				String id = consoleReader.readLine();
+				String id = CONSOLE_READER.readLine();
 				LOG.info("Enter the employee name: \n");
-				String name = consoleReader.readLine();
+				String name = CONSOLE_READER.readLine();
 				LOG.info("Enter the employee salary: \n");
-				Long salary = Long.parseLong(consoleReader.readLine());
+				Long salary = Long.parseLong(CONSOLE_READER.readLine());
 				EmployeePayRoll employeePayRoll = new EmployeePayRoll(id, name, salary);
 				employeePayRollList.add(employeePayRoll);
 			}
@@ -106,21 +106,27 @@ public class EmployeePayRollMain {
 	}
 
 	// update employee payroll-details in database
-	public void updateEmployeePayRollDetails(IOService ioService, Long basic_pay, String name)
+	public boolean updateEmployeePayRollDetails(IOService ioService, Long basicPay, String name)
 			throws EmployeePayRollException {
-		EmployeePayRollDBService.getInstance().updateBasicPayDetailsInDatabase(basic_pay, name);
+		if (ioService.equals(IOService.DB_IO)
+				&& EmployeePayRollDBService.getInstance().updateBasicPayDetailsInDatabase(basicPay, name)) {
+			EmployeePayRoll employeePayRoll = getEmployeePayRoll(name);
+			if (employeePayRoll != null)
+				employeePayRoll.setEmpSalary(basicPay);
+			return true;
+		}
+		return false;
 	}
 
 	// update multiple employee payroll-details in database without threads
 	public void updateMultipleEmployeePayRollDetailsWithoutThread(List<EmployeePayRoll> empList) {
 		empList.forEach(emp -> {
-			LOG.info("Employee being updated: " + emp.getEmpName());
+			LOG.info("Employee being updated: ", emp.getEmpName());
 			try {
-				if (EmployeePayRollDBService.getInstance().updateBasicPayDetailsInDatabase(emp.getEmpSalary(),
-						emp.getEmpName()))
-					LOG.info("Employee updated: " + emp.getEmpName());
+				if (updateEmployeePayRollDetails(IOService.DB_IO, emp.getEmpSalary(), emp.getEmpName()))
+					LOG.info("Employee updated: ", emp.getEmpName());
 				else
-					LOG.info("Employee not updated: " + emp.getEmpName());
+					LOG.info("Employee not updated: ", emp.getEmpName());
 			} catch (EmployeePayRollException e) {
 				e.printStackTrace();
 			}
@@ -134,14 +140,13 @@ public class EmployeePayRollMain {
 		empList.forEach(emp -> {
 			Runnable task = () -> {
 				mapUpdateStatus.put(emp.hashCode(), false);
-				LOG.info("Employee being updated: " + Thread.currentThread().getName());
+				LOG.info("Employee being updated: ", Thread.currentThread().getName());
 				try {
-					if (EmployeePayRollDBService.getInstance().updateBasicPayDetailsInDatabase(emp.getEmpSalary(),
-							emp.getEmpName())) {
+					if (updateEmployeePayRollDetails(IOService.DB_IO, emp.getEmpSalary(), emp.getEmpName())) {
 						mapUpdateStatus.put(emp.hashCode(), true);
-						LOG.info("Employee updated: " + Thread.currentThread().getName());
+						LOG.info("Employee updated: ", Thread.currentThread().getName());
 					} else
-						LOG.info("Employee not updated: " + Thread.currentThread().getName());
+						LOG.info("Employee not updated: ", Thread.currentThread().getName());
 				} catch (EmployeePayRollException e) {
 					e.printStackTrace();
 				}
@@ -162,7 +167,7 @@ public class EmployeePayRollMain {
 	// writes employee payroll details to console or file or database
 	public void writeEmployeePayRollDetails(IOService ioService) throws EmployeePayRollException {
 		if (ioService.equals(IOService.CONSOLE_IO))
-			LOG.info(employeePayRollList.toString());
+			LOG.info(employeePayRollList);
 		if (ioService.equals(IOService.FILE_IO))
 			new EmployeePayRollIOService().writeEmployeePayRollDetailsToFile(employeePayRollList);
 	}
@@ -176,11 +181,11 @@ public class EmployeePayRollMain {
 	// adds multiple employee payroll objects to database and employee pay roll list
 	public void addEmployeePayRollDetailsToDBWithOutThread(List<EmployeePayRoll> empList) {
 		empList.forEach(emp -> {
-			LOG.info("Employee being added: " + emp.getEmpName());
+			LOG.info("Employee being added: ", emp.getEmpName());
 			try {
 				if (EmployeePayRollDBService.getInstance().addEmployeePayRollDetails(emp)) {
 					employeePayRollList.add(emp);
-					LOG.info("Employee added: " + emp.getEmpName());
+					LOG.info("Employee added: ", emp.getEmpName());
 				}
 			} catch (EmployeePayRollException e) {
 				LOG.error(e.getMessage());
@@ -195,12 +200,12 @@ public class EmployeePayRollMain {
 		empList.forEach(emp -> {
 			Runnable task = () -> {
 				employeeAdditionStatus.put(emp.hashCode(), false);
-				LOG.info("Employee being added: " + Thread.currentThread().getName());
+				LOG.info("Employee being added: ", Thread.currentThread().getName());
 				try {
 					if (EmployeePayRollDBService.getInstance().addEmployeePayRollDetails(emp)) {
 						employeePayRollList.add(emp);
 						employeeAdditionStatus.put(emp.hashCode(), true);
-						LOG.info("Employee added: " + Thread.currentThread().getName());
+						LOG.info("Employee added: ", Thread.currentThread().getName());
 					}
 				} catch (EmployeePayRollException e) {
 					e.printStackTrace();
@@ -253,7 +258,7 @@ public class EmployeePayRollMain {
 		if (ioService.equals(IOService.FILE_IO)) {
 			entriesCount = new EmployeePayRollIOService().countEntries();
 		}
-		LOG.info("No. of entries in the file: " + entriesCount);
+		LOG.info("No. of entries in the file: ", entriesCount);
 		return entriesCount;
 	}
 
@@ -261,5 +266,10 @@ public class EmployeePayRollMain {
 	public void printDetails(IOService ioService) throws EmployeePayRollException {
 		if (ioService.equals(IOService.FILE_IO))
 			new EmployeePayRollIOService().printDetails();
+	}
+
+	// returns the EmployeePayRoll object
+	private EmployeePayRoll getEmployeePayRoll(String name) {
+		return employeePayRollList.stream().filter(emp -> emp.getEmpName().equals(name)).findFirst().orElse(null);
 	}
 }

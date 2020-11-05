@@ -6,8 +6,8 @@ import com.bridgelabs.employeepayroll.connector.PayRollDatabaseConnector;
 import com.bridgelabs.employeepayroll.model.EmployeePayRollException;
 
 public class EmployeePayRollDBServiceFunc {
-	private static PreparedStatement empStatement;
-	private static ResultSet resultSet;
+	private PreparedStatement empStatement;
+	private ResultSet resultSet;
 	private static EmployeePayRollDBServiceFunc employeePayRollDBServiceFunc;
 
 	// no-arg constructor made private to ensure singleton property
