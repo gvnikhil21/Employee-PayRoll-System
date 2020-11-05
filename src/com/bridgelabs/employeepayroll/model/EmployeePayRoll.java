@@ -34,10 +34,14 @@ public class EmployeePayRoll {
 		this.gender = gender;
 	}
 
-	public EmployeePayRoll(String empId, String empName, long empSalary, char gender, LocalDate startDate,
-			String companyId) {
+	public EmployeePayRoll(String empId, String empName, long empSalary, char gender, LocalDate startDate) {
 		this(empId, empName, empSalary, gender);
 		this.startDate = startDate;
+	}
+
+	public EmployeePayRoll(String empId, String empName, long empSalary, char gender, LocalDate startDate,
+			String companyId) {
+		this(empId, empName, empSalary, gender, startDate);
 		this.companyId = companyId;
 	}
 

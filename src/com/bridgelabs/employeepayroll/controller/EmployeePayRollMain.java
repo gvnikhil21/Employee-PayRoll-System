@@ -26,12 +26,12 @@ public class EmployeePayRollMain {
 	// parameterized constructor initializes consoleReader
 	public EmployeePayRollMain(List<EmployeePayRoll> employeePayRollList) {
 		this();
-		this.employeePayRollList = employeePayRollList;
+		employeePayRollList.stream().forEach(emp -> this.employeePayRollList.add(emp));
 	}
 
 	// enum for different input output services
 	public enum IOService {
-		CONSOLE_IO, FILE_IO, DB_IO
+		CONSOLE_IO, FILE_IO, DB_IO, REST_IO
 	}
 
 	public static void main(String[] args) {
@@ -173,9 +173,18 @@ public class EmployeePayRollMain {
 	}
 
 	// adds employee payroll object to database and employee pay roll list
-	public void addEmployeePayRollDetailsToDB(EmployeePayRoll employeePayRoll) throws EmployeePayRollException {
-		if (EmployeePayRollDBService.getInstance().addEmployeePayRollDetails(employeePayRoll))
+	public boolean addEmployeePayRollDetails(EmployeePayRoll employeePayRoll, IOService ioService)
+			throws EmployeePayRollException {
+		if (ioService.equals(IOService.DB_IO)
+				&& EmployeePayRollDBService.getInstance().addEmployeePayRollDetails(employeePayRoll)) {
 			employeePayRollList.add(employeePayRoll);
+			return true;
+		}
+		if (ioService.equals(IOService.REST_IO)) {
+			employeePayRollList.add(employeePayRoll);
+			return true;
+		}
+		return false;
 	}
 
 	// adds multiple employee payroll objects to database and employee pay roll list
@@ -183,8 +192,7 @@ public class EmployeePayRollMain {
 		empList.forEach(emp -> {
 			LOG.info("Employee being added: ", emp.getEmpName());
 			try {
-				if (EmployeePayRollDBService.getInstance().addEmployeePayRollDetails(emp)) {
-					employeePayRollList.add(emp);
+				if (addEmployeePayRollDetails(emp, IOService.DB_IO)) {
 					LOG.info("Employee added: ", emp.getEmpName());
 				}
 			} catch (EmployeePayRollException e) {
@@ -202,8 +210,7 @@ public class EmployeePayRollMain {
 				employeeAdditionStatus.put(emp.hashCode(), false);
 				LOG.info("Employee being added: ", Thread.currentThread().getName());
 				try {
-					if (EmployeePayRollDBService.getInstance().addEmployeePayRollDetails(emp)) {
-						employeePayRollList.add(emp);
+					if (addEmployeePayRollDetails(emp, IOService.DB_IO)) {
 						employeeAdditionStatus.put(emp.hashCode(), true);
 						LOG.info("Employee added: ", Thread.currentThread().getName());
 					}

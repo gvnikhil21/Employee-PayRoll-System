@@ -23,7 +23,7 @@ public class EmployeePayRollMainTest {
 	private static EmployeePayRollMain employeePayRollMain;
 
 	@Before
-	public static void init() {
+	public void init() {
 		employeePayRollMain = new EmployeePayRollMain();
 	}
 
@@ -170,7 +170,7 @@ public class EmployeePayRollMainTest {
 		EmployeePayRoll actualEmployeePayRoll = new EmployeePayRoll("Bezos", 5000000, 'M', LocalDate.now(), "1",
 				DepartmentId);
 		try {
-			employeePayRollMain.addEmployeePayRollDetailsToDB(actualEmployeePayRoll);
+			employeePayRollMain.addEmployeePayRollDetails(actualEmployeePayRoll, IOService.DB_IO);
 			employeePayRoll = employeePayRollMain.employeePayRollList.stream()
 					.filter(emp -> emp.getEmpName().equals("Bezos")).findFirst().orElse(null);
 		} catch (EmployeePayRollException e) {
