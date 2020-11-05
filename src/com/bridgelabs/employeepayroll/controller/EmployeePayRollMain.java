@@ -127,12 +127,12 @@ public class EmployeePayRollMain {
 	// update multiple employee payroll-details in database without threads
 	public void updateMultipleEmployeePayRollDetailsWithoutThread(List<EmployeePayRoll> empList) {
 		empList.forEach(emp -> {
-			LOG.info("Employee being updated: ", emp.getEmpName());
+			LOG.info("Employee being updated: " + emp.getEmpName());
 			try {
 				if (updateEmployeePayRollDetails(IOService.DB_IO, emp.getEmpSalary(), emp.getEmpName()))
-					LOG.info("Employee updated: ", emp.getEmpName());
+					LOG.info("Employee updated: " + emp.getEmpName());
 				else
-					LOG.info("Employee not updated: ", emp.getEmpName());
+					LOG.info("Employee not updated: " + emp.getEmpName());
 			} catch (EmployeePayRollException e) {
 				e.printStackTrace();
 			}
@@ -146,13 +146,13 @@ public class EmployeePayRollMain {
 		empList.forEach(emp -> {
 			Runnable task = () -> {
 				mapUpdateStatus.put(emp.hashCode(), false);
-				LOG.info("Employee being updated: ", Thread.currentThread().getName());
+				LOG.info("Employee being updated: " + Thread.currentThread().getName());
 				try {
 					if (updateEmployeePayRollDetails(IOService.DB_IO, emp.getEmpSalary(), emp.getEmpName())) {
 						mapUpdateStatus.put(emp.hashCode(), true);
-						LOG.info("Employee updated: ", Thread.currentThread().getName());
+						LOG.info("Employee updated: " + Thread.currentThread().getName());
 					} else
-						LOG.info("Employee not updated: ", Thread.currentThread().getName());
+						LOG.info("Employee not updated: " + Thread.currentThread().getName());
 				} catch (EmployeePayRollException e) {
 					e.printStackTrace();
 				}
@@ -196,10 +196,10 @@ public class EmployeePayRollMain {
 	// adds multiple employee payroll objects to database and employee pay roll list
 	public void addEmployeePayRollDetailsToDBWithOutThread(List<EmployeePayRoll> empList) {
 		empList.forEach(emp -> {
-			LOG.info("Employee being added: ", emp.getEmpName());
+			LOG.info("Employee being added: " + emp.getEmpName());
 			try {
 				if (addEmployeePayRollDetails(emp, IOService.DB_IO)) {
-					LOG.info("Employee added: ", emp.getEmpName());
+					LOG.info("Employee added: " + emp.getEmpName());
 				}
 			} catch (EmployeePayRollException e) {
 				LOG.error(e.getMessage());
@@ -214,11 +214,11 @@ public class EmployeePayRollMain {
 		empList.forEach(emp -> {
 			Runnable task = () -> {
 				employeeAdditionStatus.put(emp.hashCode(), false);
-				LOG.info("Employee being added: ", Thread.currentThread().getName());
+				LOG.info("Employee being added: " + Thread.currentThread().getName());
 				try {
 					if (addEmployeePayRollDetails(emp, IOService.DB_IO)) {
 						employeeAdditionStatus.put(emp.hashCode(), true);
-						LOG.info("Employee added: ", Thread.currentThread().getName());
+						LOG.info("Employee added: " + Thread.currentThread().getName());
 					}
 				} catch (EmployeePayRollException e) {
 					e.printStackTrace();
@@ -270,8 +270,12 @@ public class EmployeePayRollMain {
 		long entriesCount = 0;
 		if (ioService.equals(IOService.FILE_IO)) {
 			entriesCount = new EmployeePayRollIOService().countEntries();
+			LOG.info("No. of entries in the file: " + entriesCount);
 		}
-		LOG.info("No. of entries in the file: ", entriesCount);
+		if (ioService.equals(IOService.REST_IO)) {
+			entriesCount = employeePayRollList.size();
+			LOG.info("No. of entries in the server: " + entriesCount);
+		}
 		return entriesCount;
 	}
 

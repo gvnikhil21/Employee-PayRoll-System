@@ -11,54 +11,6 @@
         "day": 5
       },
       "isActive": true
-    },
-    {
-      "empId": "2",
-      "empName": "Piyush",
-      "empSalary": 6000000,
-      "gender": "M",
-      "startDate": {
-        "year": 2020,
-        "month": 11,
-        "day": 5
-      },
-      "isActive": true
-    },
-    {
-      "empId": "3",
-      "empName": "Nirmala",
-      "empSalary": 7000000,
-      "gender": "F",
-      "startDate": {
-        "year": 2020,
-        "month": 11,
-        "day": 5
-      },
-      "isActive": true
-    },
-    {
-      "empId": "4",
-      "empName": "Sonia",
-      "empSalary": 6000000,
-      "gender": "F",
-      "startDate": {
-        "year": 2020,
-        "month": 11,
-        "day": 5
-      },
-      "isActive": true
-    },
-    {
-      "empId": "5",
-      "empName": "Kalam",
-      "empSalary": 9000000,
-      "gender": "M",
-      "startDate": {
-        "year": 2020,
-        "month": 11,
-        "day": 5
-      },
-      "isActive": true
     }
   ]
 }

@@ -6,6 +6,7 @@ import java.time.LocalDate;
 import java.util.Arrays;
 
 import org.junit.*;
+import org.junit.runners.MethodSorters;
 
 import com.bridgelabs.employeepayroll.controller.EmployeePayRollMain;
 import com.bridgelabs.employeepayroll.controller.EmployeePayRollMain.IOService;
@@ -17,6 +18,7 @@ import io.restassured.RestAssured;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
 
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class EmployeePayRollRESTAPITest {
 	@Before
 	public void setup() {
@@ -25,7 +27,7 @@ public class EmployeePayRollRESTAPITest {
 	}
 
 	@Test
-	public void givenEmployee_WhenAdded_ShouldMatch201Response() {
+	public void test1_givenEmployee_WhenAdded_ShouldMatch201Response() {
 		EmployeePayRoll[] empArray = getEmployeeList();
 		EmployeePayRollMain employeePayRollMain = new EmployeePayRollMain(Arrays.asList(empArray));
 		EmployeePayRoll[] empPayRoll = { new EmployeePayRoll("2", "Piyush", 6000000l, 'M', LocalDate.now()),
@@ -48,7 +50,7 @@ public class EmployeePayRollRESTAPITest {
 	}
 
 	@Test
-	public void givenEmployeeSalary_WhenUpdated_ShouldMatch() {
+	public void test2_givenEmployeeSalary_WhenUpdated_ShouldMatch() {
 		EmployeePayRoll[] empPayRoll = getEmployeeList();
 		EmployeePayRollMain employeePayRollMain = new EmployeePayRollMain(Arrays.asList(empPayRoll));
 		try {
@@ -67,6 +69,20 @@ public class EmployeePayRollRESTAPITest {
 		assertEquals(Long.valueOf(6000000), employeePayRoll.getEmpSalary());
 	}
 
+	@Test
+	public void test3_givenEmployees_WhenRetrieved_ShouldMatchCount() {
+		EmployeePayRoll[] empArray = getEmployeeList();
+		EmployeePayRollMain employeePayRollMain = new EmployeePayRollMain(Arrays.asList(empArray));
+		long recordsCount = 0l;
+		try {
+			recordsCount = employeePayRollMain.countEntries(IOService.REST_IO);
+		} catch (EmployeePayRollException e) {
+			e.printStackTrace();
+		}
+		assertEquals(5, recordsCount);
+	}
+
+	// adds employee to json-server
 	private Response addEmployeeToJSONServer(EmployeePayRoll empPayRoll) {
 		String Json = new Gson().toJson(empPayRoll);
 		RequestSpecification request = RestAssured.given();
@@ -75,6 +91,7 @@ public class EmployeePayRollRESTAPITest {
 		return request.post("/employees");
 	}
 
+	// returns array of employeePayRoll object from json-server
 	private EmployeePayRoll[] getEmployeeList() {
 		Response response = RestAssured.get("/employees");
 		EmployeePayRollMain.LOG.info("Employee payroll details(in JSON server): \n" + response.getBody().asString());
