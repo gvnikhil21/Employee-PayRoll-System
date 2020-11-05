@@ -47,6 +47,26 @@ public class EmployeePayRollRESTAPITest {
 		assertEquals(5, employeePayRollMain.employeePayRollList.size());
 	}
 
+	@Test
+	public void givenEmployeeSalary_WhenUpdated_ShouldMatch() {
+		EmployeePayRoll[] empPayRoll = getEmployeeList();
+		EmployeePayRollMain employeePayRollMain = new EmployeePayRollMain(Arrays.asList(empPayRoll));
+		try {
+			employeePayRollMain.updateEmployeePayRollDetails(IOService.REST_IO, 6000000l, "Goyal");
+		} catch (EmployeePayRollException e) {
+			e.printStackTrace();
+		}
+		EmployeePayRoll employeePayRoll = employeePayRollMain.getEmployeePayRoll("Goyal");
+		String Json = new Gson().toJson(employeePayRoll);
+		RequestSpecification request = RestAssured.given();
+		request.header("Content-Type", "application/json");
+		request.body(Json);
+		Response response = request.put("/employees/" + employeePayRoll.getEmpId());
+		int statusCode = response.getStatusCode();
+		assertEquals(200, statusCode);
+		assertEquals(Long.valueOf(6000000), employeePayRoll.getEmpSalary());
+	}
+
 	private Response addEmployeeToJSONServer(EmployeePayRoll empPayRoll) {
 		String Json = new Gson().toJson(empPayRoll);
 		RequestSpecification request = RestAssured.given();

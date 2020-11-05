@@ -115,6 +115,12 @@ public class EmployeePayRollMain {
 				employeePayRoll.setEmpSalary(basicPay);
 			return true;
 		}
+		if (ioService.equals(IOService.REST_IO)) {
+			EmployeePayRoll employeePayRoll = getEmployeePayRoll(name);
+			if (employeePayRoll != null)
+				employeePayRoll.setEmpSalary(basicPay);
+			return true;
+		}
 		return false;
 	}
 
@@ -276,7 +282,7 @@ public class EmployeePayRollMain {
 	}
 
 	// returns the EmployeePayRoll object
-	private EmployeePayRoll getEmployeePayRoll(String name) {
+	public EmployeePayRoll getEmployeePayRoll(String name) {
 		return employeePayRollList.stream().filter(emp -> emp.getEmpName().equals(name)).findFirst().orElse(null);
 	}
 }
